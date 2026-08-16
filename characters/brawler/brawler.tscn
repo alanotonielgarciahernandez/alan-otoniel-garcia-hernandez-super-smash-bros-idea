@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://bhwcnlj7x8ff7"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_lgekj"]
+height = 40.0
+
+[node name="Brawler" type="CharacterBody2D" unique_id=607234549]
+metadata/launch_direction = Vector2(0, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=138225110]
+shape = SubResource("CapsuleShape2D_lgekj")

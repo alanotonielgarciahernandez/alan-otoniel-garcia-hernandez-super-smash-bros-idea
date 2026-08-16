@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://cymx4a718hw8h"]
+
+[ext_resource type="PackedScene" uid="uid://bbtbo0644l11x" path="res://stages/omega/omega.tscn" id="1_0xm2m"]
+[ext_resource type="PackedScene" uid="uid://bhwcnlj7x8ff7" path="res://characters/brawler/brawler.tscn" id="2_h2yge"]
+[ext_resource type="Script" uid="uid://d4fjoeee8ur2g" path="res://characters/character_controller.gd" id="3_1bvp3"]
+[ext_resource type="PackedScene" uid="uid://dbl4aiixjh6sw" path="res://camera/camera.tscn" id="3_h2yge"]
+
+[node name="Main" type="Node" unique_id=381190186]
+
+[node name="Omega" parent="." unique_id=619451180 instance=ExtResource("1_0xm2m")]
+
+[node name="Brawler" parent="." unique_id=607234549 instance=ExtResource("2_h2yge")]
+position = Vector2(135, -70)
+script = ExtResource("3_1bvp3")
+
+[node name="Camera" parent="." unique_id=1712798942 instance=ExtResource("3_h2yge")]
+position = Vector2(300, 0)

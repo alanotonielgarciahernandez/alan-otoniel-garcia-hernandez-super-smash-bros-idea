@@ -1,0 +1,44 @@
+[gd_scene format=3 uid="uid://bbtbo0644l11x"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hle2f"]
+size = Vector2(1920, 1080)
+
+[node name="Omega" type="Node2D" unique_id=2003145091]
+
+[node name="HardPlatform" type="StaticBody2D" parent="." unique_id=1333687169]
+collision_layer = 7
+collision_mask = 7
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="HardPlatform" unique_id=1747261287]
+polygon = PackedVector2Array(0, 0, 600, 0, 600, 50, 500, 100, 400, 125, 200, 125, 100, 100, 0, 50)
+metadata/_edit_lock_ = true
+
+[node name="Polygon2D" type="Polygon2D" parent="HardPlatform" unique_id=1734263958]
+color = Color(0.589096, 0.589096, 0.589096, 1)
+polygon = PackedVector2Array(0, 0, 600, 0, 600, 50, 0, 50, 500, 100, 100, 100, 200, 125, 400, 125)
+uv = PackedVector2Array(162.614, 30.8435, 149.891, -1.90735e-06, 151.433, 8.48195, 15.7141, 30.3855, 39.8745, 36.9973, 111.971, 37.4214)
+polygons = [PackedInt32Array(0, 3, 5, 6, 7, 4, 2, 1)]
+internal_vertex_count = 6
+metadata/_edit_lock_ = true
+
+[node name="SafeZone" type="Area2D" parent="." unique_id=1173628192]
+position = Vector2(300, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="SafeZone" unique_id=525373453]
+shape = SubResource("RectangleShape2D_hle2f")
+debug_color = Color(0.666667, 0, 0, 0)
+
+[node name="StartPoint1" type="Node2D" parent="." unique_id=82005081]
+position = Vector2(100, 0)
+
+[node name="StartPoint2" type="Node2D" parent="." unique_id=1586850515]
+position = Vector2(500, 0)
+
+[node name="StartPoint3" type="Node2D" parent="." unique_id=800685175]
+position = Vector2(200, 0)
+
+[node name="StartPoint4" type="Node2D" parent="." unique_id=283371983]
+position = Vector2(400, 0)
+
+[node name="RespawnPoint" type="Node2D" parent="." unique_id=1483327199]
+position = Vector2(300, -225)

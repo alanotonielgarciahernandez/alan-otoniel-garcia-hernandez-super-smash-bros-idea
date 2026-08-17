@@ -1,0 +1,33 @@
+[gd_scene format=3 uid="uid://bhwcnlj7x8ff7"]
+
+[ext_resource type="PackedScene" uid="uid://wyj0ju8joa11" path="res://state/state_machine.tscn" id="1_54qew"]
+[ext_resource type="Script" uid="uid://d4fjoeee8ur2g" path="res://characters/character_controller.gd" id="1_ke030"]
+[ext_resource type="Script" uid="uid://ctjp2vcrom3d1" path="res://state/character_states/character_state_idle.gd" id="2_3fwhk"]
+[ext_resource type="Script" uid="uid://kv230paw03dp" path="res://state/character_states/character_state_run.gd" id="3_mdkfl"]
+[ext_resource type="Script" uid="uid://ccdla722f8tph" path="res://state/character_states/character_state_jump.gd" id="4_b1u1o"]
+[ext_resource type="Script" uid="uid://bkuf6dnf4jf6c" path="res://state/character_states/character_state_fall.gd" id="5_ke030"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_lgekj"]
+height = 40.0
+
+[node name="Character" type="CharacterBody2D" unique_id=607234549]
+script = ExtResource("1_ke030")
+metadata/launch_direction = Vector2(0, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=138225110]
+shape = SubResource("CapsuleShape2D_lgekj")
+
+[node name="StateMachine" parent="." unique_id=2001641582 node_paths=PackedStringArray("initial_state") instance=ExtResource("1_54qew")]
+initial_state = NodePath("CharacterStateIdle")
+
+[node name="CharacterStateIdle" type="Node" parent="StateMachine" unique_id=565919010]
+script = ExtResource("2_3fwhk")
+
+[node name="CharacterStateRun" type="Node" parent="StateMachine" unique_id=949445134]
+script = ExtResource("3_mdkfl")
+
+[node name="CharacterStateJump" type="Node" parent="StateMachine" unique_id=1928691271]
+script = ExtResource("4_b1u1o")
+
+[node name="CharacterStateFall" type="Node" parent="StateMachine" unique_id=718154582]
+script = ExtResource("5_ke030")

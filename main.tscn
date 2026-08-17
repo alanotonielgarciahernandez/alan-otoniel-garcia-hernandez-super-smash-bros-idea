@@ -1,17 +1,24 @@
 [gd_scene format=3 uid="uid://cymx4a718hw8h"]
 
 [ext_resource type="PackedScene" uid="uid://bbtbo0644l11x" path="res://stages/omega/omega.tscn" id="1_0xm2m"]
-[ext_resource type="PackedScene" uid="uid://bhwcnlj7x8ff7" path="res://characters/brawler/brawler.tscn" id="2_h2yge"]
-[ext_resource type="Script" uid="uid://d4fjoeee8ur2g" path="res://characters/character_controller.gd" id="3_1bvp3"]
+[ext_resource type="PackedScene" uid="uid://bhwcnlj7x8ff7" path="res://characters/character.tscn" id="2_h2yge"]
 [ext_resource type="PackedScene" uid="uid://dbl4aiixjh6sw" path="res://camera/camera.tscn" id="3_h2yge"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_g4v7s"]
+size = Vector2(60, 20)
 
 [node name="Main" type="Node" unique_id=381190186]
 
 [node name="Omega" parent="." unique_id=619451180 instance=ExtResource("1_0xm2m")]
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Omega" unique_id=948510457]
+position = Vector2(295, -73)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Omega/StaticBody2D" unique_id=1784637992]
+shape = SubResource("RectangleShape2D_g4v7s")
+
 [node name="Brawler" parent="." unique_id=607234549 instance=ExtResource("2_h2yge")]
 position = Vector2(135, -70)
-script = ExtResource("3_1bvp3")
 
 [node name="Camera" parent="." unique_id=1712798942 instance=ExtResource("3_h2yge")]
 position = Vector2(300, 0)

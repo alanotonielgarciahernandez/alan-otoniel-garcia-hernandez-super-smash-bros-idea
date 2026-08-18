@@ -25,8 +25,8 @@ func physics_process( _delta: float ) -> void:
 		_character.velocity.y + _character.get_gravity().y * _delta
 	);
 	
-	# Double jump (Jump state will consume flag).
-	if Input.is_action_just_pressed( 'jump' ) and _character.double_jump_charged:
+	# Double/extra jump (Jump state will consume a charge).
+	if Input.is_action_just_pressed( 'jump' ) and _character.jumps_used < CharacterController.MAX_JUMPS:
 		state_machine.transition_to( 'CharacterStateJump' );
 		return;
 	
@@ -34,8 +34,8 @@ func physics_process( _delta: float ) -> void:
 	
 	# Landed.
 	if _character.is_on_floor():
-		# Recharge double jump.
-		_character.double_jump_charged = true;
+		# Recharge jumps.
+		_character.recharge_jumps();
 		
 		if direction != 0.0:
 			# Change state to Run if player keeps moving.

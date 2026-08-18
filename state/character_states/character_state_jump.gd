@@ -3,7 +3,7 @@ extends State;
 ## Character Object reference.
 var _character: CharacterController;
 
-## How many pixels left/right we are allowed to correct (Smash-style is usually 4–8 px)
+## How many pixels left/right we are allowed to correct.
 const CORNER_CORRECTION: float = 6.0;
 
 
@@ -12,9 +12,13 @@ func start() -> void:
 	
 	# TODO: Play jump animation.
 	
-	# Consume double jump if we are in the air and coyote time has passed.
-	if not _character.is_on_floor() and _character.falling_timer >= CharacterController.COYOTE_TIME:
-		_character.double_jump_charged = false;
+	# If we're past the Coyote Time window and haven't jumped yet, the free
+	# ground jump chance is gone — this jump must consume the first charge.
+	if not _character.is_on_floor() and _character.falling_timer >= CharacterController.COYOTE_TIME and _character.jumps_used == 0:
+		_character.jumps_used = 1;
+	
+	# Consume a jump for this jump action.
+	_character.jumps_used += 1;
 	
 	# Jump.
 	_character.velocity.y = CharacterController.JUMP_VELOCITY;
@@ -59,9 +63,16 @@ func physics_process( _delta: float ) -> void:
 	
 	_character.move_and_slide();
 
-	# Landed (rare, but possible with very short jumps)
+	# Landed.
 	if _character.is_on_floor():
-		_land();
+		# Recharge jumps.
+		_character.recharge_jumps();
+		
+		if direction != 0.0:
+			# Change state to Run if player keeps moving.
+			state_machine.transition_to( 'CharacterStateRun' );
+		else:
+			state_machine.transition_to( 'CharacterStateIdle' );
 
 
 func _try_corner_correction() -> void:
@@ -86,13 +97,3 @@ func _try_corner_correction() -> void:
 			if not _character.test_move( test_transform, motion ):
 				_character.global_position += offset;
 				return;
-
-func _land() -> void:
-	# Recharge double jump.
-	_character.double_jump_charged = true;
-	
-	if Input.get_axis( 'move_left', 'move_right' ) != 0.0:
-		# Change state to Run if player keeps moving.
-		state_machine.transition_to( 'CharacterStateRun' );
-	else:
-		state_machine.transition_to( 'CharacterStateIdle' );

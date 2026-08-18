@@ -1,15 +1,19 @@
 extends State;
 
 ## Character Object reference.
-var _character: CharacterBody2D;
+var _character: CharacterController;
+
+## How many pixels left/right we are allowed to correct (Smash-style is usually 4–8 px)
+const CORNER_CORRECTION: float = 6.0;
+
 
 func start() -> void:
 	_character = controlled_node;
 	
 	# TODO: Play jump animation.
 	
-	# Consume double jump if we are in the air.
-	if not _character.is_on_floor():
+	# Consume double jump if we are in the air and coyote time has passed.
+	if not _character.is_on_floor() and _character.falling_timer >= CharacterController.COYOTE_TIME:
 		_character.double_jump_charged = false;
 	
 	# Jump.
@@ -50,12 +54,38 @@ func physics_process( _delta: float ) -> void:
 	if _character.velocity.y > 0.0:
 		state_machine.transition_to( 'CharacterStateFall' );
 		return;
+		
+	_try_corner_correction();
 	
 	_character.move_and_slide();
 
 	# Landed (rare, but possible with very short jumps)
 	if _character.is_on_floor():
 		_land();
+
+
+func _try_corner_correction() -> void:
+	# Only when we are still trying to go up
+	if _character.velocity.y >= 0.0:
+		return;
+
+	var delta := get_physics_process_delta_time();
+	var motion := Vector2( 0.0, _character.velocity.y * delta );
+
+	# If we would not hit a ceiling, nothing to do
+	if not _character.test_move( _character.global_transform, motion ):
+		return;
+
+	# Try small horizontal offsets
+	for i in range( 1, int( CORNER_CORRECTION ) + 1 ):
+		for direction in [ -1.0, 1.0 ]:
+			var offset := Vector2( i * direction, 0.0 );
+			var test_transform := _character.global_transform.translated( offset );
+
+			# If this offset lets us move upward freely → apply it
+			if not _character.test_move( test_transform, motion ):
+				_character.global_position += offset;
+				return;
 
 func _land() -> void:
 	# Recharge double jump.

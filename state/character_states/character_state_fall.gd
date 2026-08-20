@@ -37,6 +37,11 @@ func physics_process( _delta: float ) -> void:
 		# Recharge jumps.
 		_character.recharge_jumps();
 		
+		# Consume a buffered jump input pressed just before landing.
+		if _character.consume_buffered_input( 'jump' ):
+			state_machine.transition_to( 'CharacterStateJump' );
+			return;
+		
 		if direction != 0.0:
 			# Change state to Run if player keeps moving.
 			state_machine.transition_to( 'CharacterStateRun' );

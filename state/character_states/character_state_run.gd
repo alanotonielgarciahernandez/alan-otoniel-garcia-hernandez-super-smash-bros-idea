@@ -7,6 +7,11 @@ func start() -> void:
 	_character = controlled_node;
 	
 	# TODO: Play running animation.
+	
+	# Consume a buffered jump input from just before entering run.
+	if _character.consume_buffered_input( 'jump' ):
+		state_machine.transition_to( 'CharacterStateJump' );
+		return;
 
 func process( _delta: float ) -> void:
 	var direction := Input.get_axis( 'move_left', 'move_right' );

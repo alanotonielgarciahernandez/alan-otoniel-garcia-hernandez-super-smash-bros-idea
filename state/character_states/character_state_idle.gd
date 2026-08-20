@@ -8,6 +8,11 @@ func start() -> void:
 	
 	# TODO: Play idle animation.
 	_character.velocity.x = 0.0;
+	
+	# Consume a buffered jump input from just before landing/entering idle.
+	if _character.consume_buffered_input( 'jump' ):
+		state_machine.transition_to( 'CharacterStateJump' );
+		return;
 
 func process( _delta: float ) -> void:
 	var direction := Input.get_axis( 'move_left', 'move_right' );

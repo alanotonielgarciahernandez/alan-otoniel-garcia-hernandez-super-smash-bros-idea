@@ -10,7 +10,8 @@ const CORNER_CORRECTION: float = 6.0;
 func start() -> void:
 	_character = controlled_node;
 	
-	# TODO: Play jump animation.
+	# Play jump animation.
+	_character.animator.play( 'jump' );
 	
 	# If we're past the Coyote Time window and haven't jumped yet, the free
 	# ground jump chance is gone — this jump must consume the first charge.
@@ -65,19 +66,7 @@ func physics_process( _delta: float ) -> void:
 
 	# Landed.
 	if _character.is_on_floor():
-		# Recharge jumps.
-		_character.recharge_jumps();
-		
-		# Consume a buffered jump input pressed just before landing.
-		if _character.consume_buffered_input( 'jump' ):
-			state_machine.transition_to( 'CharacterStateJump' );
-			return;
-		
-		if direction != 0.0:
-			# Change state to Run if player keeps moving.
-			state_machine.transition_to( 'CharacterStateRun' );
-		else:
-			state_machine.transition_to( 'CharacterStateIdle' );
+		state_machine.transition_to( 'CharacterStateLand' );
 
 
 func _try_corner_correction() -> void:

@@ -1,12 +1,13 @@
 extends State;
 
 ## Character Object reference.
-var _character: CharacterBody2D;
+var _character: CharacterController;
 
 func start() -> void:
 	_character = controlled_node;
 	
-	# TODO: Play fall animation.
+	# Play fall animation.
+	_character.animator.play( 'fall' );
 
 func physics_process( _delta: float ) -> void:
 	# Get move direction.
@@ -34,16 +35,4 @@ func physics_process( _delta: float ) -> void:
 	
 	# Landed.
 	if _character.is_on_floor():
-		# Recharge jumps.
-		_character.recharge_jumps();
-		
-		# Consume a buffered jump input pressed just before landing.
-		if _character.consume_buffered_input( 'jump' ):
-			state_machine.transition_to( 'CharacterStateJump' );
-			return;
-		
-		if direction != 0.0:
-			# Change state to Run if player keeps moving.
-			state_machine.transition_to( 'CharacterStateRun' );
-		else:
-			state_machine.transition_to( 'CharacterStateIdle' );
+		state_machine.transition_to( 'CharacterStateLand' );

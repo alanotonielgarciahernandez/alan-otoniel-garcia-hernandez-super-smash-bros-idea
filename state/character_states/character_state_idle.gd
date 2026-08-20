@@ -1,12 +1,15 @@
 extends State;
 
 ## Character Object reference.
-var _character: CharacterBody2D;
+var _character: CharacterController;
 
 func start() -> void:
 	_character = controlled_node;
 	
-	# TODO: Play idle animation.
+	# Play idle animation.
+	_character.animator.play( 'idle' );
+	
+	# Set horizontal velocity to 0.
 	_character.velocity.x = 0.0;
 	
 	# Consume a buffered jump input from just before landing/entering idle.

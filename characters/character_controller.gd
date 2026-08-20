@@ -29,6 +29,12 @@ const JUMP_CUT_MULTIPLIER: float = 0.6;
 ## Maximum speed at which the player can fall.
 const TERMINAL_VELOCITY: float = 220.0;
 
+## How long the player will recover from falling.
+const LAND_TIME: float = 0.12;
+
+## Character Animator object reference.
+@export var animator: AnimatedSprite2D;
+
 ## Stores buffered actions and the time (in seconds, engine ticks) after which they expire.
 var _buffered_inputs: Dictionary = {};
 
@@ -40,6 +46,9 @@ var jump_hold_timer: float = 0.0;
 
 ## Timer that keeps track of the amount of time character has been in air.
 var falling_timer: float = 0.0;
+
+## Timer that keeps track of the amount of time character has been recovering from falling.
+var land_timer: float = 0.0;
 
 
 func _physics_process( _delta: float ) -> void:

@@ -1,12 +1,13 @@
 extends State;
 
 ## Character Object reference.
-var _character: CharacterBody2D;
+var _character: CharacterController;
 
 func start() -> void:
 	_character = controlled_node;
 	
-	# TODO: Play running animation.
+	# Play run animation.
+	_character.animator.play( 'run' );
 	
 	# Consume a buffered jump input from just before entering run.
 	if _character.consume_buffered_input( 'jump' ):
@@ -31,6 +32,11 @@ func process( _delta: float ) -> void:
 func physics_process( _delta: float ) -> void:
 	# Get move direction.
 	var direction := Input.get_axis( 'move_left', 'move_right' );
+	
+	if direction == 1:
+		_character.animator.flip_h = false;
+	elif direction == -1:
+		_character.animator.flip_h = true;
 	
 	# Move.
 	_character.velocity.x = move_toward(

@@ -33,9 +33,11 @@ func physics_process( _delta: float ) -> void:
 	# Get move direction.
 	var direction := Input.get_axis( 'move_left', 'move_right' );
 	
-	if direction == 1:
+	if direction > 0.0:
+		# Facing right.
 		_character.animator.flip_h = false;
-	elif direction == -1:
+	elif direction < 0.0:
+		# Facing left.
 		_character.animator.flip_h = true;
 	
 	# Move.

@@ -3,7 +3,7 @@ extends CharacterBody2D;
 
 
 ## Time window (seconds) an input remains "buffered" before it's considered stale.
-const INPUT_BUFFER_WINDOW: float = 0.1;
+const INPUT_BUFFER_WINDOW: float = 0.15;
 
 ## Walking Speed.
 const WALK_SPEED: float = 200.0;

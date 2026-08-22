@@ -6,10 +6,10 @@ var _character: CharacterController;
 func start() -> void:
 	_character = controlled_node;
 	
-	# Play run animation.
-	_character.animator.play( 'run' );
+	# Play jog animation.
+	_character.animator.play( 'jog' );
 	
-	# Consume a buffered jump input from just before entering run.
+	# Consume a buffered jump input from just before entering jog.
 	if _character.consume_buffered_input( 'jump' ):
 		state_machine.transition_to( 'CharacterStateJump' );
 		return;
@@ -23,12 +23,13 @@ func process( _delta: float ) -> void:
 	
 	var magnitude := absf( direction );
 	
+	# Check for a dash trigger (analog flick, or keyboard double-tap re-press).
+	if _character.consume_dash_trigger( magnitude ):
+		state_machine.transition_to( 'CharacterStateRun' );
+		return;
+	
 	if magnitude < CharacterController.WALK_MAGNITUDE_THRESHOLD:
 		state_machine.transition_to( 'CharacterStateWalk' );
-		return;
-	elif magnitude < CharacterController.RUN_MAGNITUDE_THRESHOLD:
-		# Tilt eased off below full: drop back to Jog tier.
-		state_machine.transition_to( 'CharacterStateJog' );
 		return;
 	
 	if Input.is_action_just_pressed( 'jump' ):
@@ -49,7 +50,7 @@ func physics_process( _delta: float ) -> void:
 	
 	_character.velocity.x = move_toward(
 		_character.velocity.x,
-		direction * CharacterController.RUN_SPEED,
+		direction * CharacterController.JOG_SPEED,
 		CharacterController.ACCELERATION_SPEED * _delta
 	);
 	

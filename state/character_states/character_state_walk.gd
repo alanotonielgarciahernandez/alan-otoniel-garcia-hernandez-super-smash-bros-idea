@@ -6,10 +6,10 @@ var _character: CharacterController;
 func start() -> void:
 	_character = controlled_node;
 	
-	# Play run animation.
-	_character.animator.play( 'run' );
+	# Play walk animation.
+	_character.animator.play( 'walk' );
 	
-	# Consume a buffered jump input from just before entering run.
+	# Consume a buffered jump input from just before entering walk.
 	if _character.consume_buffered_input( 'jump' ):
 		state_machine.transition_to( 'CharacterStateJump' );
 		return;
@@ -23,11 +23,12 @@ func process( _delta: float ) -> void:
 	
 	var magnitude := absf( direction );
 	
-	if magnitude < CharacterController.WALK_MAGNITUDE_THRESHOLD:
-		state_machine.transition_to( 'CharacterStateWalk' );
+	# Check for a dash trigger (quick flick to full tilt).
+	if _character.consume_dash_trigger( magnitude ):
+		state_machine.transition_to( 'CharacterStateRun' );
 		return;
-	elif magnitude < CharacterController.RUN_MAGNITUDE_THRESHOLD:
-		# Tilt eased off below full: drop back to Jog tier.
+	
+	if magnitude >= CharacterController.WALK_MAGNITUDE_THRESHOLD:
 		state_machine.transition_to( 'CharacterStateJog' );
 		return;
 	
@@ -47,9 +48,10 @@ func physics_process( _delta: float ) -> void:
 	elif direction < 0.0:
 		_character.animator.flip_h = true;
 	
+	# Move — direction already scales speed continuously within Walk's magnitude band.
 	_character.velocity.x = move_toward(
 		_character.velocity.x,
-		direction * CharacterController.RUN_SPEED,
+		direction * CharacterController.WALK_SPEED,
 		CharacterController.ACCELERATION_SPEED * _delta
 	);
 	

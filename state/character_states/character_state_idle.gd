@@ -21,7 +21,7 @@ func process( _delta: float ) -> void:
 	var direction := Input.get_axis( 'move_left', 'move_right' );
 	
 	if direction != 0.0:
-		state_machine.transition_to( 'CharacterStateRun' );
+		state_machine.transition_to( _character.get_ground_move_state( direction ) );
 		return;
 	
 	if Input.is_action_just_pressed( 'jump' ):

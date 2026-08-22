@@ -14,6 +14,9 @@ func start() -> void:
 	
 	# Set horizontal velocity to 0.
 	_character.velocity.x = 0.0;
+	
+	# Reset land timer before start recovering.
+	_character.land_timer = 0;
 
 func process( _delta: float ) -> void:
 	# Check for a buffered jump every frame during recovery, so an input
@@ -22,17 +25,16 @@ func process( _delta: float ) -> void:
 		state_machine.transition_to( 'CharacterStateJump' );
 		return;
 	
-	if Input.get_axis( 'move_left', 'move_right' ) != 0.0:
-		state_machine.transition_to( 'CharacterStateRun' );
-		return;
+	var direction := Input.get_axis( 'move_left', 'move_right' );
+	if direction != 0.0:
+		state_machine.transition_to( _character.get_ground_move_state( direction ) );
+	else:
+		state_machine.transition_to( 'CharacterStateIdle' );
 	
 	# Count character landing recovery.
 	if _character.land_timer < CharacterController.LAND_TIME:
 		_character.land_timer += _delta;
 		return;
-	
-	# Reset land timer after recovering.
-	_character.land_timer = 0;
 	
 	state_machine.transition_to( 'CharacterStateIdle' );
 

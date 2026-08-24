@@ -15,7 +15,7 @@ func start() -> void:
 		return;
 
 func process( _delta: float ) -> void:
-	var direction := Input.get_axis( 'move_left', 'move_right' );
+	var direction := _character.get_move_axis();
 	
 	if direction == 0.0:
 		state_machine.transition_to( 'CharacterStateIdle' );
@@ -23,16 +23,12 @@ func process( _delta: float ) -> void:
 	
 	var magnitude := absf( direction );
 	
-	# Check for a dash trigger (quick flick to full tilt).
-	if _character.consume_dash_trigger( magnitude ):
-		state_machine.transition_to( 'CharacterStateRun' );
-		return;
-	
 	if magnitude >= CharacterController.WALK_MAGNITUDE_THRESHOLD:
-		state_machine.transition_to( 'CharacterStateJog' );
+		# Re-evaluate tier (may go to Jog or straight to Run on a dash).
+		state_machine.transition_to( _character.get_ground_move_state( direction ) );
 		return;
 	
-	if Input.is_action_just_pressed( 'jump' ):
+	if _character.is_jump_just_pressed():
 		state_machine.transition_to( 'CharacterStateJump' );
 		return;
 	
@@ -41,7 +37,7 @@ func process( _delta: float ) -> void:
 		return;
 
 func physics_process( _delta: float ) -> void:
-	var direction := Input.get_axis( 'move_left', 'move_right' );
+	var direction := _character.get_move_axis();
 	
 	if direction > 0.0:
 		_character.animator.flip_h = false;

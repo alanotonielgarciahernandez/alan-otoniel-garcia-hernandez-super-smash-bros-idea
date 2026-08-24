@@ -11,7 +11,7 @@ func start() -> void:
 
 func physics_process( _delta: float ) -> void:
 	# Get move direction.
-	var direction := Input.get_axis( 'move_left', 'move_right' );
+	var direction := _character.get_move_axis();
 	
 	# Move.
 	_character.velocity.x = move_toward(
@@ -27,7 +27,7 @@ func physics_process( _delta: float ) -> void:
 	);
 	
 	# Double/extra jump (Jump state will consume a charge).
-	if Input.is_action_just_pressed( 'jump' ) and _character.jumps_used < CharacterController.MAX_JUMPS:
+	if _character.is_jump_pressed() and _character.jumps_used < CharacterController.MAX_JUMPS:
 		state_machine.transition_to( 'CharacterStateJump' );
 		return;
 	

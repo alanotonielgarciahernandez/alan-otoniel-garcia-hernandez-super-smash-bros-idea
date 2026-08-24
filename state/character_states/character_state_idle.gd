@@ -18,13 +18,13 @@ func start() -> void:
 		return;
 
 func process( _delta: float ) -> void:
-	var direction := Input.get_axis( 'move_left', 'move_right' );
+	var direction := _character.get_move_axis();
 	
 	if direction != 0.0:
 		state_machine.transition_to( _character.get_ground_move_state( direction ) );
 		return;
 	
-	if Input.is_action_just_pressed( 'jump' ):
+	if _character.is_jump_just_pressed():
 		state_machine.transition_to( 'CharacterStateJump' );
 		return;
 	

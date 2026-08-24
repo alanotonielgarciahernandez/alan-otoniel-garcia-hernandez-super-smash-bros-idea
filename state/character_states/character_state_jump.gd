@@ -29,7 +29,7 @@ func start() -> void:
 
 func physics_process( _delta: float ) -> void:
 	# Get move direction.
-	var direction := Input.get_axis( 'move_left', 'move_right' );
+	var direction := _character.get_move_axis();
 	
 	# Move.
 	_character.velocity.x = move_toward(
@@ -40,7 +40,7 @@ func physics_process( _delta: float ) -> void:
 
 	# Keep applying upward velocity while the button is held.
 	# This makes the _character continue trying to go up even if it hits a ceiling.
-	if Input.is_action_pressed( 'jump' ) and _character.jump_hold_timer > 0.0:
+	if _character.is_jump_pressed() and _character.jump_hold_timer > 0.0:
 		# Jump.
 		_character.velocity.y = CharacterController.JUMP_VELOCITY;
 		

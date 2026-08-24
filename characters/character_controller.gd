@@ -50,6 +50,11 @@ const LAND_TIME: float = 0.12;
 ## Character Animator object reference.
 @export var animator: AnimatedSprite2D;
 
+## Device controlling this character. -1 = keyboard. 0+ = joypad index,
+## matching Input.get_connected_joypads(). Assign per instance (editor
+## inspector, or a spawner/character-select screen).
+@export var device_id: int = -1;
+
 ## Stores buffered actions and the time (in seconds, engine ticks) after which they expire.
 var _buffered_inputs: Dictionary = {};
 
@@ -65,56 +70,25 @@ var falling_timer: float = 0.0;
 ## Timer that keeps track of the amount of time character has been recovering from falling.
 var land_timer: float = 0.0;
 
+## Device-specific input reader, created once in _ready() based on device_id.
+## Never re-evaluated afterward — this character always listens to only this device.
+var _input_reader: InputReader;
 
-## Whether the most recent horizontal input came from an analog device (joypad).
-var _last_input_was_analog: bool = false;
+func _ready() -> void:
+	# Assign the input reader matching this character's device, once.
+	_input_reader = KeyboardInputReader.new() if device_id == -1 else JoypadInputReader.new( device_id );
 
-## Whether horizontal input was neutral (near-zero) last frame.
-var _was_neutral: bool = true;
+## Returns this character's horizontal input axis, from its assigned device only.
+func get_move_axis() -> float:
+	return _input_reader.get_move_axis();
 
-## Timestamp the dash window was armed.
-var _neutral_since: float = 0.0;
+## Whether jump was pressed this frame, from this character's assigned device only.
+func is_jump_just_pressed() -> bool:
+	return _input_reader.is_jump_just_pressed();
 
-## Whether a dash trigger is currently armed and awaiting full-tilt input.
-var _dash_window_armed: bool = false;
-
-## Returns the current horizontal input magnitude (0.0 - 1.0), ignoring direction.
-func get_move_magnitude() -> float:
-	return maxf( Input.get_action_strength( 'move_left' ), Input.get_action_strength( 'move_right' ) );
-
-## Tracks neutral <-> active input transitions each physics frame, arming the
-## dash detection window differently depending on the input device.
-func _update_dash_tracking( magnitude: float ) -> void:
-	var is_neutral := magnitude < 0.1;
-	
-	if _last_input_was_analog:
-		# Analog: keep re-arming while near neutral, so even a first quick
-		# flick from a stand-still counts as a dash trigger.
-		if is_neutral:
-			_neutral_since = Time.get_ticks_msec() / 1000.0;
-			_dash_window_armed = true;
-	else:
-		# Digital (keyboard): only arm on the exact frame input drops from
-		# active to neutral, so a dash requires a real release + re-press.
-		if is_neutral and not _was_neutral:
-			_neutral_since = Time.get_ticks_msec() / 1000.0;
-			_dash_window_armed = true;
-	
-	_was_neutral = is_neutral;
-
-## Checks (and consumes) whether the current input counts as a dash trigger
-## into Run. Safe to call every frame; only fires once per armed window.
-func consume_dash_trigger( magnitude: float ) -> bool:
-	if not _dash_window_armed or magnitude < RUN_MAGNITUDE_THRESHOLD:
-		return false;
-	
-	var now := Time.get_ticks_msec() / 1000.0;
-	var triggered: bool = ( now - _neutral_since ) <= RUN_INPUT_WINDOW;
-	
-	# Disarm regardless of outcome, so a stale window can't fire later.
-	_dash_window_armed = false;
-	
-	return triggered;
+## Whether jump is currently held, from this character's assigned device only.
+func is_jump_pressed() -> bool:
+	return _input_reader.is_jump_pressed();
 
 ## Returns the grounded movement state to enter for the given horizontal
 ## input — used when starting fresh movement (from Idle or on landing).
@@ -124,7 +98,7 @@ func get_ground_move_state( direction: float ) -> String:
 	if magnitude == 0.0:
 		return 'CharacterStateIdle';
 	
-	if consume_dash_trigger( magnitude ):
+	if _input_reader.consume_dash_trigger():
 		return 'CharacterStateRun';
 	
 	if magnitude < WALK_MAGNITUDE_THRESHOLD:
@@ -140,19 +114,13 @@ func _physics_process( _delta: float ) -> void:
 	else:
 		falling_timer += _delta;
 	
-	# Track neutral/active input transitions for dash (Run) detection.
-	_update_dash_tracking( get_move_magnitude() );
+	# Refresh this character's input reader (just-pressed tracking, dash window).
+	_input_reader.update();
 
 func _unhandled_input( event: InputEvent ) -> void:
-	# Buffer jump input the instant it's pressed, regardless of current state.
-	if event.is_action_pressed( 'jump' ):
+	# Buffer jump input the instant it's pressed on this character's device.
+	if _input_reader.is_jump_press_event( event ):
 		buffer_input( 'jump' );
-	
-	# Track whether horizontal input is currently coming from an analog device.
-	if event is InputEventJoypadMotion and event.axis == JOY_AXIS_LEFT_X:
-		_last_input_was_analog = true;
-	elif event is InputEventKey and event.pressed:
-		_last_input_was_analog = false;
 
 
 ## Buffers an action so a state can consume it shortly after, even if pressed too early.

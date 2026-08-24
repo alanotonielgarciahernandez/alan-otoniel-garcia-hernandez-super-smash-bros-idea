@@ -15,7 +15,7 @@ func start() -> void:
 		return;
 
 func process( _delta: float ) -> void:
-	var direction := Input.get_axis( 'move_left', 'move_right' );
+	var direction := _character.get_move_axis();
 	
 	if direction == 0.0:
 		state_machine.transition_to( 'CharacterStateIdle' );
@@ -23,16 +23,17 @@ func process( _delta: float ) -> void:
 	
 	var magnitude := absf( direction );
 	
-	# Check for a dash trigger (analog flick, or keyboard double-tap re-press).
-	if _character.consume_dash_trigger( magnitude ):
-		state_machine.transition_to( 'CharacterStateRun' );
-		return;
-	
 	if magnitude < CharacterController.WALK_MAGNITUDE_THRESHOLD:
 		state_machine.transition_to( 'CharacterStateWalk' );
 		return;
 	
-	if Input.is_action_just_pressed( 'jump' ):
+	# Still within Jog's magnitude band — check if this input counts as a dash.
+	var target_state := _character.get_ground_move_state( direction );
+	if target_state == 'CharacterStateRun':
+		state_machine.transition_to( target_state );
+		return;
+	
+	if _character.is_jump_just_pressed():
 		state_machine.transition_to( 'CharacterStateJump' );
 		return;
 	
@@ -41,7 +42,7 @@ func process( _delta: float ) -> void:
 		return;
 
 func physics_process( _delta: float ) -> void:
-	var direction := Input.get_axis( 'move_left', 'move_right' );
+	var direction := _character.get_move_axis();
 	
 	if direction > 0.0:
 		_character.animator.flip_h = false;

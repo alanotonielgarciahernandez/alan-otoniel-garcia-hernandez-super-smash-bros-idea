@@ -27,7 +27,7 @@ func physics_process( _delta: float ) -> void:
 	);
 	
 	# Double/extra jump (Jump state will consume a charge).
-	if _character.is_jump_pressed() and _character.jumps_used < CharacterController.MAX_JUMPS:
+	if _character.is_jump_just_pressed() and _character.jumps_used < CharacterController.MAX_JUMPS:
 		state_machine.transition_to( 'CharacterStateJump' );
 		return;
 	

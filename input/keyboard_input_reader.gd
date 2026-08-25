@@ -1,18 +1,30 @@
 class_name KeyboardInputReader;
 extends InputReader;
 
-## Reads exclusively from keyboard, via the shared move/jump actions
-## (these actions must only have keyboard events bound to them in the
-## InputMap — joypads read through JoypadInputReader instead).
+func _init() -> void:
+	# Default bindings — overwritten later if a save file exists.
+	_bindings = {
+		'move_left': KEY_LEFT,
+		'move_right': KEY_RIGHT,
+		'jump': KEY_SPACE,
+	};
+
+func is_action_pressed( action: String ) -> bool:
+	if not _bindings.has( action ):
+		return false;
+	
+	return Input.is_key_pressed( _bindings[ action ] );
+
+func is_action_press_event( action: String, event: InputEvent ) -> bool:
+	if not _bindings.has( action ) or not event is InputEventKey:
+		return false;
+	
+	return event.pressed and not event.echo and event.keycode == _bindings[ action ];
 
 func get_move_axis() -> float:
-	return Input.get_axis( 'move_left', 'move_right' );
-
-func is_jump_pressed() -> bool:
-	return Input.is_action_pressed( 'jump' );
-
-func is_jump_press_event( event: InputEvent ) -> bool:
-	return event is InputEventKey and event.is_action_pressed( 'jump' );
+	var left := 1.0 if is_action_pressed( 'move_left' ) else 0.0;
+	var right := 1.0 if is_action_pressed( 'move_right' ) else 0.0;
+	return right - left;
 
 func _arms_dash_continuously() -> bool:
 	# Digital: only counts as a dash on an explicit release -> press.

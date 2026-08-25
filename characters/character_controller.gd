@@ -78,17 +78,33 @@ func _ready() -> void:
 	# Assign the input reader matching this character's device, once.
 	_input_reader = KeyboardInputReader.new() if device_id == -1 else JoypadInputReader.new( device_id );
 
-## Returns this character's horizontal input axis, from its assigned device only.
-func get_move_axis() -> float:
-	return _input_reader.get_move_axis();
+func _physics_process( _delta: float ) -> void:
+	# Falling timer resets if character is on floor.
+	if is_on_floor():
+		falling_timer = 0.0;
+	else:
+		falling_timer += _delta;
+	
+	# Refresh this character's input reader (just-pressed tracking, dash window).
+	_input_reader.update();
+
+func _unhandled_input( event: InputEvent ) -> void:
+	# Buffer jump input the instant it's pressed on this character's device.
+	if _input_reader.is_action_press_event( 'jump', event ):
+		buffer_input( 'jump' );
+
 
 ## Whether jump was pressed this frame, from this character's assigned device only.
 func is_jump_just_pressed() -> bool:
-	return _input_reader.is_jump_just_pressed();
+	return _input_reader.is_action_just_pressed( 'jump' );
 
 ## Whether jump is currently held, from this character's assigned device only.
 func is_jump_pressed() -> bool:
-	return _input_reader.is_jump_pressed();
+	return _input_reader.is_action_pressed( 'jump' );
+
+## Returns this character's horizontal input axis, from its assigned device only.
+func get_move_axis() -> float:
+	return _input_reader.get_move_axis();
 
 ## Returns the grounded movement state to enter for the given horizontal
 ## input — used when starting fresh movement (from Idle or on landing).
@@ -105,23 +121,6 @@ func get_ground_move_state( direction: float ) -> String:
 		return 'CharacterStateWalk';
 	
 	return 'CharacterStateJog';
-
-
-func _physics_process( _delta: float ) -> void:
-	# Falling timer resets if character is on floor.
-	if is_on_floor():
-		falling_timer = 0.0;
-	else:
-		falling_timer += _delta;
-	
-	# Refresh this character's input reader (just-pressed tracking, dash window).
-	_input_reader.update();
-
-func _unhandled_input( event: InputEvent ) -> void:
-	# Buffer jump input the instant it's pressed on this character's device.
-	if _input_reader.is_jump_press_event( event ):
-		buffer_input( 'jump' );
-
 
 ## Buffers an action so a state can consume it shortly after, even if pressed too early.
 func buffer_input( action: String ) -> void:

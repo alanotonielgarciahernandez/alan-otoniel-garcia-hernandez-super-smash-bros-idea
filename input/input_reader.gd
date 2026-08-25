@@ -7,6 +7,16 @@ const RUN_MAGNITUDE_THRESHOLD: float = 0.9;
 ## Time window to detect a dash gesture (flick or re-press).
 const RUN_INPUT_WINDOW: float = 0.15;
 
+## action_name -> binding value (Key for keyboard, JoyButton for joypad).
+var _bindings: Dictionary = {};
+
+## action_name -> whether it was held last physics frame, for just-pressed detection.
+var _was_pressed: Dictionary = {};
+
+## action_name -> whether it was pressed this physics frame (not last).
+## Refreshed for every known binding each update().
+var _just_pressed: Dictionary = {};
+
 ## Whether horizontal input was neutral (near-zero) last physics frame.
 var _was_neutral: bool = true;
 
@@ -15,12 +25,6 @@ var _neutral_since: float = 0.0;
 
 ## Whether a dash trigger is currently armed and awaiting full-tilt input.
 var _dash_window_armed: bool = false;
-
-## Whether jump was held last physics frame, to detect just-pressed transitions.
-var _was_jump_pressed: bool = false;
-
-## Whether jump was pressed on this physics frame (not last). Valid after update().
-var _jump_just_pressed: bool = false;
 
 
 ## Returns horizontal input axis (-1.0 to 1.0). Overridden per device.
@@ -31,17 +35,25 @@ func get_move_axis() -> float:
 func get_move_magnitude() -> float:
 	return absf( get_move_axis() );
 
-## Whether jump is currently held. Overridden per device.
-func is_jump_pressed() -> bool:
+## Whether 'action' is currently held. Overridden per device.
+func is_action_pressed( _action: String ) -> bool:
 	return false;
 
-## Whether jump was pressed this frame (not last). Valid after update() runs.
-func is_jump_just_pressed() -> bool:
-	return _jump_just_pressed;
+## Whether 'action' was pressed this physics frame (not last). Valid after update().
+func is_action_just_pressed( action: String ) -> bool:
+	return _just_pressed.get( action, false );
 
-## Whether a raw input event is a jump press on this specific device. Overridden per device.
-func is_jump_press_event( _event: InputEvent ) -> bool:
+## Whether a raw input event is a press of 'action' on this specific device. Overridden per device.
+func is_action_press_event( _action: String, _event: InputEvent ) -> bool:
 	return false;
+
+## Rebinds 'action' to a new binding value (Key or JoyButton depending on device).
+func rebind( action: String, binding_value ) -> void:
+	_bindings[ action ] = binding_value;
+
+## Returns the current binding for 'action', or null if unbound.
+func get_binding( action: String ):
+	return _bindings.get( action, null );
 
 ## Whether this device arms the dash window on every pass through neutral
 ## (analog-style flick) or only on an explicit release -> press (digital-style
@@ -51,10 +63,11 @@ func _arms_dash_continuously() -> bool:
 
 ## Call once per physics frame to refresh just-pressed / dash tracking.
 func update() -> void:
-	# Track jump just-pressed.
-	var jump_pressed := is_jump_pressed();
-	_jump_just_pressed = jump_pressed and not _was_jump_pressed;
-	_was_jump_pressed = jump_pressed;
+	# Refresh just-pressed state for every bound action.
+	for action in _bindings:
+		var pressed := is_action_pressed( action );
+		_just_pressed[ action ] = pressed and not _was_pressed.get( action, false );
+		_was_pressed[ action ] = pressed;
 	
 	# Track neutral <-> active transitions to arm the dash detection window.
 	var is_neutral := get_move_magnitude() < 0.1;

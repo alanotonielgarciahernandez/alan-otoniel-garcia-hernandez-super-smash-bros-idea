@@ -1,8 +1,11 @@
+# keyboard_input_reader.gd
+# Overrides InputReader class variables and methods.
+
 class_name KeyboardInputReader;
 extends InputReader;
 
 func _init() -> void:
-	# Default bindings — overwritten later if a save file exists.
+	# TODO: Default bindings — overwritten later if a save file exists.
 	_bindings = {
 		'move_left': KEY_LEFT,
 		'move_right': KEY_RIGHT,
@@ -10,12 +13,14 @@ func _init() -> void:
 	};
 
 func is_action_pressed( action: String ) -> bool:
+	# Return false if action is not listed.
 	if not _bindings.has( action ):
 		return false;
 	
 	return Input.is_key_pressed( _bindings[ action ] );
 
 func is_action_press_event( action: String, event: InputEvent ) -> bool:
+	# Return false if action is not listed.
 	if not _bindings.has( action ) or not event is InputEventKey:
 		return false;
 	

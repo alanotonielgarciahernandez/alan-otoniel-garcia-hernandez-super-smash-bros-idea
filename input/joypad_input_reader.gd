@@ -1,3 +1,6 @@
+# joypad_input_reader.gd
+# Overrides InputReader class variables and methods.
+
 class_name JoypadInputReader;
 extends InputReader;
 
@@ -15,12 +18,14 @@ func _init( joypad_device: int ) -> void:
 	# Note: movement stays a fixed stick axis, not a rebindable button.
 
 func is_action_pressed( action: String ) -> bool:
+	# Return false if action is not listed.
 	if not _bindings.has( action ):
 		return false;
 	
 	return Input.is_joy_button_pressed( device, _bindings[ action ] );
 
 func is_action_press_event( action: String, event: InputEvent ) -> bool:
+	# Return false if action is not listed.
 	if not _bindings.has( action ) or not event is InputEventJoypadButton:
 		return false;
 	

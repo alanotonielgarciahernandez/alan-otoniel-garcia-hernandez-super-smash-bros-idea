@@ -17,6 +17,9 @@ const RUN_SPEED: float = 320.0;
 ## Walking acceleration speed, based on the default Jog tier.
 const ACCELERATION_SPEED: float = JOG_SPEED * 6.0;
 
+## Spped applied when character is in air.
+const AIR_SPEED: float = 200.0;
+
 ## Analog magnitude below which movement counts as Walk instead of Jog.
 const WALK_MAGNITUDE_THRESHOLD: float = 0.5;
 

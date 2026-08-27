@@ -16,7 +16,7 @@ func physics_process( _delta: float ) -> void:
 	# Move.
 	_character.velocity.x = move_toward(
 		_character.velocity.x,
-		direction * CharacterController.WALK_SPEED,
+		direction * CharacterController.AIR_SPEED,
 		CharacterController.ACCELERATION_SPEED * _delta
 	);
 	

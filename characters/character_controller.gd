@@ -1,3 +1,10 @@
+# character_controller.gd
+# Main Character controller.
+#
+# Assigned device will control de character.
+# Buffers jump input.
+# Keeps track of States shared variables.
+
 class_name CharacterController;
 extends CharacterBody2D;
 

@@ -27,7 +27,7 @@ func start() -> void:
 	# Setup jump hold timer.
 	_character.jump_hold_timer = CharacterController.JUMP_HOLD_TIME;
 
-func physics_process( _delta: float ) -> void:
+func physics_process( delta: float ) -> void:
 	# Get move direction.
 	var direction := _character.get_move_axis();
 	
@@ -35,7 +35,7 @@ func physics_process( _delta: float ) -> void:
 	_character.velocity.x = move_toward(
 		_character.velocity.x,
 		direction * CharacterController.AIR_SPEED,
-		CharacterController.ACCELERATION_SPEED * _delta
+		CharacterController.ACCELERATION_SPEED * delta
 	);
 
 	# Keep applying upward velocity while the button is held.
@@ -45,7 +45,7 @@ func physics_process( _delta: float ) -> void:
 		_character.velocity.y = CharacterController.JUMP_VELOCITY;
 		
 		# Consume jump hold timer.
-		_character.jump_hold_timer -= _delta;
+		_character.jump_hold_timer -= delta;
 	else:
 		# Button released early → cut vertical momentum.
 		if _character.velocity.y < 0.0:

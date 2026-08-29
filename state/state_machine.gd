@@ -50,12 +50,18 @@ func _unhandled_input( event: InputEvent ) -> void:
 
 #endregion
 
-## State transition function.
 ## Executes current state end method and changes to new state.
-## @param new_state: New state name string.
 func transition_to( new_state: String ) -> void:
+	# Skip no-op transitions so we don't restart the current state's animation.
+	if current_state and current_state.name == new_state:
+		return;
+	
+	# End the current state before switching, if one is active.
 	if current_state:
 		current_state.end();
 	
+	# Look up and assign the new state node.
 	current_state = get_node( new_state );
+	
+	# Run shared startup logic for the new state.
 	_state_start();

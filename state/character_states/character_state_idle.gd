@@ -32,11 +32,8 @@ func process( _delta: float ) -> void:
 		state_machine.transition_to( 'CharacterStateFall' );
 		return;
 
-func physics_process( _delta: float ) -> void:
-	# Gravity + terminal velocity
-	_character.velocity.y = minf(
-		CharacterController.TERMINAL_VELOCITY,
-		_character.velocity.y + _character.get_gravity().y * _delta
-	);
+func physics_process( delta: float ) -> void:
+	# Apply gravity.
+	_character.apply_gravity( delta );
 	
 	_character.move_and_slide();

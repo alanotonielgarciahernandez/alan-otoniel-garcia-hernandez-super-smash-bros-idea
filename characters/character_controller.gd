@@ -21,10 +21,12 @@ const JOG_SPEED: float = 200.0;
 ## Running speed (reached via a dash trigger).
 const RUN_SPEED: float = 320.0;
 
-## Walking acceleration speed, based on the default Jog tier.
+## Acceleration applied to all grounded movement tiers (units/sec²).
+## Currently shared across Walk/Jog/Run — see earlier note about giving
+## Run a snappier acceleration later to better match Smash's dash feel.
 const ACCELERATION_SPEED: float = JOG_SPEED * 6.0;
 
-## Spped applied when character is in air.
+## Speed applied when character is in air.
 const AIR_SPEED: float = 200.0;
 
 ## Analog magnitude below which movement counts as Walk instead of Jog.
@@ -32,9 +34,6 @@ const WALK_MAGNITUDE_THRESHOLD: float = 0.5;
 
 ## Magnitude considered "full tilt" — required (plus a dash trigger) to enter Run.
 const RUN_MAGNITUDE_THRESHOLD: float = 0.9;
-
-## Time window to detect a flick (analog) or re-press (digital) that triggers Run.
-const RUN_INPUT_WINDOW: float = 0.15;
 
 ## Time allowed for the character to perform a ground jump after leaving the floor.
 const COYOTE_TIME: float = 0.12;
@@ -159,3 +158,7 @@ func clear_buffered_input( action: String ) -> void:
 ## Resets the jump counter. Called explicitly by states once a landing is confirmed.
 func recharge_jumps() -> void:
 	jumps_used = 0;
+
+## Applies gravity to vertical velocity, clamped to terminal velocity.
+func apply_gravity( delta: float ) -> void:
+	velocity.y = minf( TERMINAL_VELOCITY, velocity.y + get_gravity().y * delta );

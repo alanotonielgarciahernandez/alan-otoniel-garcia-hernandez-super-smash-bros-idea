@@ -18,7 +18,7 @@ func start() -> void:
 	# Reset land timer before start recovering.
 	_character.land_timer = 0;
 
-func process( _delta: float ) -> void:
+func process( delta: float ) -> void:
 	# Check for a buffered jump every frame during recovery, so an input
 	# pressed at any point during landing lag isn't missed.
 	if _character.consume_buffered_input( 'jump' ):
@@ -33,17 +33,14 @@ func process( _delta: float ) -> void:
 	
 	# Count character landing recovery.
 	if _character.land_timer < CharacterController.LAND_TIME:
-		_character.land_timer += _delta;
+		_character.land_timer += delta;
 		return;
 	
 	state_machine.transition_to( 'CharacterStateIdle' );
 
-func physics_process( _delta: float ) -> void:
-	# Gravity + terminal velocity
-	_character.velocity.y = minf(
-		CharacterController.TERMINAL_VELOCITY,
-		_character.velocity.y + _character.get_gravity().y * _delta
-	);
+func physics_process( delta: float ) -> void:
+	# Apply gravity.
+	_character.apply_gravity( delta );
 	
 	_character.move_and_slide();
 	

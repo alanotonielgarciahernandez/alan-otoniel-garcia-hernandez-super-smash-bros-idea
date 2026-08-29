@@ -9,7 +9,7 @@ func start() -> void:
 	# Play fall animation.
 	_character.animator.play( 'fall' );
 
-func physics_process( _delta: float ) -> void:
+func physics_process( delta: float ) -> void:
 	# Get move direction.
 	var direction := _character.get_move_axis();
 	
@@ -17,14 +17,11 @@ func physics_process( _delta: float ) -> void:
 	_character.velocity.x = move_toward(
 		_character.velocity.x,
 		direction * CharacterController.AIR_SPEED,
-		CharacterController.ACCELERATION_SPEED * _delta
+		CharacterController.ACCELERATION_SPEED * delta
 	);
 	
-	# Gravity + terminal velocity.
-	_character.velocity.y = minf(
-		CharacterController.TERMINAL_VELOCITY,
-		_character.velocity.y + _character.get_gravity().y * _delta
-	);
+	# Apply gravity.
+	_character.apply_gravity( delta );
 	
 	# Double/extra jump (Jump state will consume a charge).
 	if _character.is_jump_just_pressed() and _character.jumps_used < CharacterController.MAX_JUMPS:

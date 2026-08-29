@@ -9,9 +9,6 @@
 class_name InputReader;
 extends RefCounted;
 
-## Magnitude considered "full tilt" — required (plus a dash gesture) to enter Run.
-const RUN_MAGNITUDE_THRESHOLD: float = 0.9;
-
 ## Time window to detect a dash gesture (flick or re-press).
 const RUN_INPUT_WINDOW: float = 0.15;
 
@@ -95,13 +92,12 @@ func update() -> void:
 func consume_dash_trigger() -> bool:
 	var magnitude := get_move_magnitude();
 	
-	if not _dash_window_armed or magnitude < RUN_MAGNITUDE_THRESHOLD:
+	if not _dash_window_armed or magnitude < CharacterController.RUN_MAGNITUDE_THRESHOLD:
 		return false;
 	
 	var now := Time.get_ticks_msec() / 1000.0;
 	var triggered: bool = ( now - _neutral_since ) <= RUN_INPUT_WINDOW;
 	
-	# Disarm regardless of outcome, so a stale window can't fire later.
 	_dash_window_armed = false;
 	
 	return triggered;

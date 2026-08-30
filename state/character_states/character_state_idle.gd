@@ -1,12 +1,10 @@
-extends State;
-
-## Character Object reference.
-var _character: CharacterController;
+extends CharacterState;
 
 func start() -> void:
-	_character = controlled_node;
+	# Run the base class's start() first to cache the character reference.
+	super.start();
 	
-	# Play idle animation.
+	# Play the idle animation.
 	_character.animator.play( 'idle' );
 	
 	# Set horizontal velocity to 0.

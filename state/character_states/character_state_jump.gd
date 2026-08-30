@@ -1,14 +1,11 @@
-extends State;
-
-## Character Object reference.
-var _character: CharacterController;
+extends CharacterState;
 
 ## How many pixels left/right we are allowed to correct.
 const CORNER_CORRECTION: float = 6.0;
 
-
 func start() -> void:
-	_character = controlled_node;
+	# Run the base class's start() first to cache the character reference.
+	super.start();
 	
 	# Play jump animation.
 	_character.animator.play( 'jump' );

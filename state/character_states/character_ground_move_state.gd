@@ -1,8 +1,12 @@
 class_name CharacterGroundMoveState;
-extends State;
+extends CharacterState;
 
-## Character Object reference.
-var _character: CharacterController;
+func start() -> void:
+	# Run the base class's start() first to cache the character reference.
+	super.start();
+	
+	# Play the idle animation.
+	_character.animator.play( 'idle' );
 
 ## Target horizontal speed for this tier — set by each subclass.
 var _speed: float = 0.0;

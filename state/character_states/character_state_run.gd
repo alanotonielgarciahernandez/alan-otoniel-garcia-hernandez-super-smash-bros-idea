@@ -1,14 +1,14 @@
 extends CharacterGroundMoveState;
 
 func start() -> void:
-	# Cache the controlled character reference for this state's lifetime.
-	_character = controlled_node;
-	
-	# Set this tier's target horizontal speed (used by the base class's physics_process).
-	_speed = CharacterController.RUN_SPEED;
+	# Run the base class's start() first to cache the character reference.
+	super.start();
 	
 	# Play the run animation.
 	_character.animator.play( 'run' );
+	
+	# Set this tier's target horizontal speed (used by the base class's physics_process).
+	_speed = CharacterController.RUN_SPEED;
 	
 	# Consume a buffered jump input from just before entering run.
 	if _character.consume_buffered_input( 'jump' ):

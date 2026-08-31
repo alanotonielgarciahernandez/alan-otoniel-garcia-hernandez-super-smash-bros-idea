@@ -1,4 +1,4 @@
-extends CharacterState;
+extends CharacterAirState;
 
 ## How many pixels left/right we are allowed to correct.
 const CORNER_CORRECTION: float = 6.0;
@@ -25,16 +25,8 @@ func start() -> void:
 	_character.jump_hold_timer = CharacterController.JUMP_HOLD_TIME;
 
 func physics_process( delta: float ) -> void:
-	# Get move direction.
-	var direction := _character.get_move_axis();
+	super.physics_process( delta );
 	
-	# Move.
-	_character.velocity.x = move_toward(
-		_character.velocity.x,
-		direction * CharacterController.AIR_SPEED,
-		CharacterController.ACCELERATION_SPEED * delta
-	);
-
 	# Keep applying upward velocity while the button is held.
 	# This makes the _character continue trying to go up even if it hits a ceiling.
 	if _character.is_jump_pressed() and _character.jump_hold_timer > 0.0:
@@ -51,7 +43,7 @@ func physics_process( delta: float ) -> void:
 		# Change state to Fall.
 		state_machine.transition_to( 'CharacterStateFall' );
 		return;
-
+	
 	# Safety: if we somehow start falling while still in Jump, change state to Fall.
 	if _character.velocity.y > 0.0:
 		state_machine.transition_to( 'CharacterStateFall' );
@@ -60,10 +52,9 @@ func physics_process( delta: float ) -> void:
 	_try_corner_correction();
 	
 	_character.move_and_slide();
-
-	# Landed.
-	if _character.is_on_floor():
-		state_machine.transition_to( 'CharacterStateLand' );
+	
+	# Check for landing only after this frame's collision is resolved.
+	_check_landed();
 
 
 func _try_corner_correction() -> void:

@@ -9,14 +9,8 @@ func start() -> void:
 	
 	# Set this tier's target horizontal speed (used by the base class's physics_process).
 	_speed = CharacterController.JOG_SPEED;
-	
-	# Consume a buffered jump input from just before entering jog.
-	if _character.consume_buffered_input( 'jump' ):
-		# A jump was queued — go straight to Jump instead of staying in Jog.
-		state_machine.transition_to( 'CharacterStateJump' );
-		return;
 
-func process( _delta: float ) -> void:
+func process( delta: float ) -> void:
 	# Get horizontal input axis from the character's assigned device.
 	var direction := _character.get_move_axis();
 	
@@ -41,12 +35,4 @@ func process( _delta: float ) -> void:
 		state_machine.transition_to( target_state );
 		return;
 	
-	# Jump was pressed this frame — switch to Jump.
-	if _character.is_jump_just_pressed():
-		state_machine.transition_to( 'CharacterStateJump' );
-		return;
-	
-	# No longer on the floor (e.g. walked off a ledge) — switch to Fall.
-	if not _character.is_on_floor():
-		state_machine.transition_to( 'CharacterStateFall' );
-		return;
+	super.process( delta );

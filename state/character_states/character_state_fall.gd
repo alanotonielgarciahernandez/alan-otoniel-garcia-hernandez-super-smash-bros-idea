@@ -1,4 +1,4 @@
-extends CharacterState;
+extends CharacterAirState;
 
 func start() -> void:
 	# Run the base class's start() first to cache the character reference.
@@ -8,15 +8,7 @@ func start() -> void:
 	_character.animator.play( 'fall' );
 
 func physics_process( delta: float ) -> void:
-	# Get move direction.
-	var direction := _character.get_move_axis();
-	
-	# Move.
-	_character.velocity.x = move_toward(
-		_character.velocity.x,
-		direction * CharacterController.AIR_SPEED,
-		CharacterController.ACCELERATION_SPEED * delta
-	);
+	super.physics_process( delta );
 	
 	# Apply gravity.
 	_character.apply_gravity( delta );
@@ -28,6 +20,5 @@ func physics_process( delta: float ) -> void:
 	
 	_character.move_and_slide();
 	
-	# Landed.
-	if _character.is_on_floor():
-		state_machine.transition_to( 'CharacterStateLand' );
+	# Check for landing only after this frame's collision is resolved.
+	_check_landed();

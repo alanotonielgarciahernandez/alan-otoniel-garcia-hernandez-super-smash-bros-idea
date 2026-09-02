@@ -1,3 +1,6 @@
+# character_state_jump.gd
+# Jump state, played when jump action is consumed from buffer.
+
 extends CharacterAirState;
 
 ## How many pixels left/right we are allowed to correct.

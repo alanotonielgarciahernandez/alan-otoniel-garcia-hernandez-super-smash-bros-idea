@@ -1,3 +1,6 @@
+# character_state_fall.gd
+# Fall state, played when character is on air and not jumping.
+
 extends CharacterAirState;
 
 func start() -> void:

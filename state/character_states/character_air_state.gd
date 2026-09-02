@@ -1,3 +1,6 @@
+# character_air_state.gd
+# Base class for character Air state.
+
 class_name CharacterAirState;
 extends CharacterState;
 

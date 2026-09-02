@@ -1,3 +1,6 @@
+# state.gd
+# State base class.
+
 class_name State;
 extends Node;
 

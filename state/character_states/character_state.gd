@@ -1,3 +1,6 @@
+# character_state.gd
+# Base class for character states.
+
 class_name CharacterState;
 extends State;
 

@@ -1,3 +1,9 @@
+# state_machine.gd
+# Character States main controller.
+#
+# It handles the states transitions.
+# It executes the states process methods.
+
 class_name StateMachine;
 extends Node;
 
@@ -24,9 +30,6 @@ func _state_default_start() -> void:
 func _state_start() -> void:
 	# Print state for debug.
 	prints( 'StateMachine', controlled_node.name, 'start state', current_state.name );
-	
-	# Pass controlled node reference to new state.
-	current_state.controlled_node = controlled_node;
 	
 	# Pass state machine reference to new state.
 	current_state.state_machine = self;

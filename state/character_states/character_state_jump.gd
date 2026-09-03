@@ -1,5 +1,9 @@
-# character_state_jump.gd
-# Jump state, played when jump action is consumed from buffer.
+# res://state/character_states/character_state_jump.gd
+# Rising jump state.
+#
+# It spends a jump charge, including coyote time after leaving the floor.
+# It holds upward velocity while the button is held, then cuts and falls.
+# It nudges around ceiling corners before move_and_slide.
 
 extends CharacterAirState;
 

@@ -1,5 +1,7 @@
-# character_state.gd
-# Base class for character states.
+# res://state/character_states/character_state.gd
+# Base class for character-driven states.
+#
+# It caches a typed CharacterController reference on start.
 
 class_name CharacterState;
 extends State;

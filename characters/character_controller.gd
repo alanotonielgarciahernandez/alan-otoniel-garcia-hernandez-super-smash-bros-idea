@@ -1,9 +1,9 @@
-# character_controller.gd
-# Main Character controller.
+# res://characters/character_controller.gd
+# Main character controller.
 #
-# Assigned device will control de character.
-# Buffers jump input.
-# Keeps track of States shared variables.
+# It binds one input device to this character.
+# It buffers jump input and stores shared movement timers.
+# It exposes speeds, gravity, and the grounded movement-tier picker.
 
 class_name CharacterController;
 extends CharacterBody2D;

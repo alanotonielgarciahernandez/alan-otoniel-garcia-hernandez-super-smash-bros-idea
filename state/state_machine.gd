@@ -1,8 +1,8 @@
-# state_machine.gd
-# Character States main controller.
+# res://state/state_machine.gd
+# Character states main controller.
 #
-# It handles the states transitions.
-# It executes the states process methods.
+# It handles state transitions by child node name.
+# It forwards process, physics, and input to the current state.
 
 class_name StateMachine;
 extends Node;

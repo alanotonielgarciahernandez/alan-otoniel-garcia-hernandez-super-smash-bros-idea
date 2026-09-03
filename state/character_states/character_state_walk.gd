@@ -1,3 +1,9 @@
+# res://state/character_states/character_state_walk.gd
+# Slow analog walk state.
+#
+# It uses Walk speed for partial stick tilt.
+# It steps up to Jog or Run when magnitude leaves the walk band.
+
 extends CharacterGroundMoveState;
 
 func start() -> void:
@@ -12,15 +18,10 @@ func start() -> void:
 
 func process( delta: float ) -> void:
 	var direction := _character.get_move_axis();
-	
-	if direction == 0.0:
-		state_machine.transition_to( 'CharacterStateIdle' );
-		return;
-	
 	var magnitude := absf( direction );
 	
+	# Stick pushed past walk threshold → re-evaluate (may become Jog or Run).
 	if magnitude >= CharacterController.WALK_MAGNITUDE_THRESHOLD:
-		# Re-evaluate tier (may go to Jog or straight to Run on a dash).
 		state_machine.transition_to( _character.get_ground_move_state( direction ) );
 		return;
 	

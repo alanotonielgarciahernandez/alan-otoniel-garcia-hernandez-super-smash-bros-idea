@@ -1,10 +1,9 @@
-# input/input_reader.gd
-# Base class for Joypad and Keyboard Input Readers.
+# res://input/input_reader.gd
+# Base class for device-specific input readers.
 #
-# It contains base variables and functions which will be overridden by the inherited classes.
-# It helps catching pressed or just pressed actions for specific devices.
-# It handles joystick flicks or keyboard double-taps logic.
-# It contains rebind functions.
+# It tracks pressed and just-pressed actions for one device.
+# It arms and consumes the dash-trigger window (flick or double-tap).
+# It stores rebindable action bindings.
 
 class_name InputReader;
 extends RefCounted;

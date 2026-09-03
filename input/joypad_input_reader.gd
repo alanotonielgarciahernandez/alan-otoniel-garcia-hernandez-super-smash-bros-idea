@@ -1,5 +1,8 @@
-# joypad_input_reader.gd
-# Overrides InputReader class variables and methods.
+# res://input/joypad_input_reader.gd
+# Joypad input reader.
+#
+# It reads one joypad's face button and left-stick axis.
+# It re-arms dash while the stick is near neutral so a first flick counts.
 
 class_name JoypadInputReader;
 extends InputReader;

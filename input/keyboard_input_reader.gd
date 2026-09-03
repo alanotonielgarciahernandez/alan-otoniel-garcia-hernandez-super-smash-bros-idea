@@ -1,5 +1,8 @@
-# keyboard_input_reader.gd
-# Overrides InputReader class variables and methods.
+# res://input/keyboard_input_reader.gd
+# Keyboard input reader.
+#
+# It maps keys to move and jump actions.
+# It arms dash only on an explicit release-then-press.
 
 class_name KeyboardInputReader;
 extends InputReader;

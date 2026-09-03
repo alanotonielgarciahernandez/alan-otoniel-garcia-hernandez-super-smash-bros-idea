@@ -1,5 +1,9 @@
-# character_state_fall.gd
-# Fall state, played when character is on air and not jumping.
+# res://state/character_states/character_state_fall.gd
+# Airborne fall state.
+#
+# It applies gravity and shared air movement.
+# It allows an extra jump while charges remain.
+# It transitions to Land once the floor is resolved.
 
 extends CharacterAirState;
 

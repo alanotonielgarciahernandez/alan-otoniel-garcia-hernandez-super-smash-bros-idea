@@ -1,3 +1,10 @@
+# res://state/character_states/character_state_idle.gd
+# Grounded idle state.
+#
+# It zeros horizontal velocity and plays the idle animation.
+# It consumes a buffered jump on enter.
+# It transitions to a ground move tier, Jump, or Fall.
+
 extends CharacterState;
 
 func start() -> void:

@@ -1,4 +1,11 @@
-extends CharacterState;
+# res://state/character_states/character_state_land.gd
+# Landing recovery state.
+#
+# It recharges jumps and zeros horizontal velocity.
+# It stays inactionable for land lag, but a buffered jump can cancel out.
+# It then enters a ground move tier or Idle, or Fall if pushed off.
+
+extends CharacterState
 
 func start() -> void:
 	# Run the base class's start() first to cache the character reference.

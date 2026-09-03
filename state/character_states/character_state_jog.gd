@@ -1,3 +1,9 @@
+# res://state/character_states/character_state_jog.gd
+# Default grounded movement state.
+#
+# It uses Jog speed for full tilt without a dash.
+# It steps down to Walk, up to Run on a dash trigger, or back to Idle.
+
 extends CharacterGroundMoveState;
 
 func start() -> void:
@@ -11,28 +17,18 @@ func start() -> void:
 	_speed = CharacterController.JOG_SPEED;
 
 func process( delta: float ) -> void:
-	# Get horizontal input axis from the character's assigned device.
 	var direction := _character.get_move_axis();
-	
-	# No input at all — drop to Idle.
-	if direction == 0.0:
-		state_machine.transition_to( 'CharacterStateIdle' );
-		return;
-	
-	# Get input magnitude regardless of direction sign.
 	var magnitude := absf( direction );
 	
-	# Magnitude dropped below Jog's band — step down to Walk.
+	# Stick eased below walk threshold → Walk.
 	if magnitude < CharacterController.WALK_MAGNITUDE_THRESHOLD:
 		state_machine.transition_to( 'CharacterStateWalk' );
 		return;
 	
-	# Still within Jog's magnitude band — check if this input counts as a dash.
-	var target_state := _character.get_ground_move_state( direction );
-	
-	# Dash trigger fired — jump straight to Run.
-	if target_state == 'CharacterStateRun':
-		state_machine.transition_to( target_state );
+	# Check for a fresh dash trigger → Run.
+	var target := _character.get_ground_move_state( direction );
+	if target == 'CharacterStateRun':
+		state_machine.transition_to( target );
 		return;
 	
 	super.process( delta );

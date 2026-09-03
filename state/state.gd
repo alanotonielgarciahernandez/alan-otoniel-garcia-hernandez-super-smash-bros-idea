@@ -1,5 +1,8 @@
-# state.gd
-# State base class.
+# res://state/state.gd
+# Generic state base class.
+#
+# It defines the start, end, process, physics, and input hooks.
+# It stores the controlled node and the owning state machine.
 
 class_name State;
 extends Node;

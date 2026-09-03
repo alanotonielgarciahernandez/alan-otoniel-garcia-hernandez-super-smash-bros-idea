@@ -1,3 +1,9 @@
+# res://state/character_states/character_state_run.gd
+# Dash-triggered grounded run state.
+#
+# It uses Run speed while stick tilt stays at full.
+# It drops to Jog, Walk, or Idle when magnitude falls.
+
 extends CharacterGroundMoveState;
 
 func start() -> void:
@@ -12,19 +18,15 @@ func start() -> void:
 
 func process( delta: float ) -> void:
 	var direction := _character.get_move_axis();
-	
-	if direction == 0.0:
-		state_machine.transition_to( 'CharacterStateIdle' );
-		return;
-	
 	var magnitude := absf( direction );
 	
-	if magnitude < CharacterController.WALK_MAGNITUDE_THRESHOLD:
-		state_machine.transition_to( 'CharacterStateWalk' );
-		return;
-	elif magnitude < CharacterController.RUN_MAGNITUDE_THRESHOLD:
-		# Tilt eased off below full: drop back to Jog tier.
-		state_machine.transition_to( 'CharacterStateJog' );
+	# Stick eased below full tilt → drop to Jog (or Walk if almost neutral).
+	if magnitude < CharacterController.RUN_MAGNITUDE_THRESHOLD:
+		if magnitude < CharacterController.WALK_MAGNITUDE_THRESHOLD:
+			state_machine.transition_to( 'CharacterStateWalk' );
+		else:
+			state_machine.transition_to( 'CharacterStateJog' );
 		return;
 	
+	# Still fully tilted — stay in Run.
 	super.process( delta );

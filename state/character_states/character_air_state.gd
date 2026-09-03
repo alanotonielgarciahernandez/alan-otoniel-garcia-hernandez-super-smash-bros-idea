@@ -1,5 +1,8 @@
-# character_air_state.gd
-# Base class for character Air state.
+# res://state/character_states/character_air_state.gd
+# Base class for airborne character states.
+#
+# It applies shared horizontal air movement.
+# It checks for landing after move_and_slide has resolved collisions.
 
 class_name CharacterAirState;
 extends CharacterState;

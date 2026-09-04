@@ -8,15 +8,32 @@ class_name CharacterAirState;
 extends CharacterState;
 
 func physics_process( delta: float ) -> void:
-	# Get move direction.
+	# Get horizontal input axis from the character's assigned device.
 	var direction := _character.get_move_axis();
 	
-	# Move.
-	_character.velocity.x = move_toward(
-		_character.velocity.x,
-		direction * CharacterController.AIR_SPEED,
-		CharacterController.ACCELERATION_SPEED * delta
-	);
+	# Decide target velocity for this frame.
+	var target_velocity_x: float = direction * CharacterController.AIR_SPEED;
+	
+	if absf( direction ) > 0.01:
+		# Player is holding a direction — accelerate toward the tier speed.
+		_character.velocity.x = move_toward(
+			_character.velocity.x,
+			target_velocity_x,
+			CharacterController.ACCELERATION_SPEED * delta
+		);
+	else:
+		# No meaningful input — apply air friction / traction.
+		_character.velocity.x = move_toward(
+			_character.velocity.x,
+			0.0,
+			CharacterController.AIR_FRICTION * delta
+		);
+	
+	# Apply gravity for this frame.
+	_character.apply_gravity( delta );
+	
+	# Move the character and resolve collisions.
+	_character.move_and_slide();
 
 ## Checks whether the character has landed. Call this AFTER move_and_slide()
 ## each frame, once this frame's floor collision is actually resolved.

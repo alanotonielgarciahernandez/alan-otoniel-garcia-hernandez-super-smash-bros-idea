@@ -58,8 +58,6 @@ func physics_process( delta: float ) -> void:
 		
 	_try_corner_correction();
 	
-	_character.move_and_slide();
-	
 	# Check for landing only after this frame's collision is resolved.
 	_check_landed();
 

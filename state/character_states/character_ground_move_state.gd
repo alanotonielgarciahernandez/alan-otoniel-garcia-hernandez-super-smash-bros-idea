@@ -38,7 +38,7 @@ func process( _delta: float ) -> void:
 		state_machine.transition_to( 'CharacterStateIdle' );
 		return;
 
-func physics_process( _delta: float ) -> void:
+func physics_process( delta: float ) -> void:
 	# Get horizontal input axis from the character's assigned device.
 	var direction := _character.get_move_axis();
 	
@@ -48,15 +48,26 @@ func physics_process( _delta: float ) -> void:
 	elif direction < 0.0:
 		_character.animator.flip_h = true;
 	
-	# Accelerate/decelerate horizontal velocity toward this tier's target speed.
-	_character.velocity.x = move_toward(
-		_character.velocity.x,
-		direction * _speed,
-		CharacterController.ACCELERATION_SPEED * _delta
-	);
+	# Decide target velocity for this frame.
+	var target_velocity_x: float = direction * _speed;
+	
+	if absf( direction ) > 0.01:
+		# Player is holding a direction — accelerate toward the tier speed.
+		_character.velocity.x = move_toward(
+			_character.velocity.x,
+			target_velocity_x,
+			CharacterController.ACCELERATION_SPEED * delta
+		);
+	else:
+		# No meaningful input — apply ground friction / traction.
+		_character.velocity.x = move_toward(
+			_character.velocity.x,
+			0.0,
+			CharacterController.GROUND_FRICTION * delta
+		);
 	
 	# Apply gravity for this frame.
-	_character.apply_gravity( _delta );
+	_character.apply_gravity( delta );
 	
 	# Move the character and resolve collisions.
 	_character.move_and_slide();

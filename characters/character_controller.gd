@@ -21,13 +21,21 @@ const JOG_SPEED: float = 200.0;
 ## Running speed (reached via a dash trigger).
 const RUN_SPEED: float = 320.0;
 
+## Speed applied when character is in air.
+const AIR_SPEED: float = 200.0;
+
 ## Acceleration applied to all grounded movement tiers (units/sec²).
 ## Currently shared across Walk/Jog/Run — see earlier note about giving
 ## Run a snappier acceleration later to better match Smash's dash feel.
 const ACCELERATION_SPEED: float = JOG_SPEED * 6.0;
 
-## Speed applied when character is in air.
-const AIR_SPEED: float = 200.0;
+## Ground friction / traction (units per second²).
+## Higher = stops faster.
+const GROUND_FRICTION: float = 1800.0;
+
+## Air friction / traction (units per second²).
+## Higher = stops faster
+const AIR_FRICTION: float = 200.0;
 
 ## Analog magnitude below which movement counts as Walk instead of Jog.
 const WALK_MAGNITUDE_THRESHOLD: float = 0.5;

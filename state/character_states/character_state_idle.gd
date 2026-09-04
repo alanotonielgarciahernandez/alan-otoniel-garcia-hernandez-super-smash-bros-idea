@@ -14,9 +14,6 @@ func start() -> void:
 	# Play the idle animation.
 	_character.animator.play( 'idle' );
 	
-	# Set horizontal velocity to 0.
-	_character.velocity.x = 0.0;
-	
 	# Consume a buffered jump input from just before landing/entering idle.
 	if _character.consume_buffered_input( 'jump' ):
 		state_machine.transition_to( 'CharacterStateJump' );
@@ -38,6 +35,13 @@ func process( _delta: float ) -> void:
 		return;
 
 func physics_process( delta: float ) -> void:
+	# Apply ground friction so any residual momentum fades naturally.
+	_character.velocity.x = move_toward(
+		_character.velocity.x,
+		0.0,
+		CharacterController.GROUND_FRICTION * delta
+	);
+	
 	# Apply gravity.
 	_character.apply_gravity( delta );
 	

@@ -29,6 +29,10 @@ const AIR_SPEED: float = 200.0;
 ## Run a snappier acceleration later to better match Smash's dash feel.
 const ACCELERATION_SPEED: float = JOG_SPEED * 6.0;
 
+## Extra horizontal speed applied once when entering Run from a dash.
+## Makes the initial dash feel snappy.
+const RUN_BURST_SPEED: float = 80.0;
+
 ## Ground friction / traction (units per second²).
 ## Higher = stops faster.
 const GROUND_FRICTION: float = 1800.0;

@@ -7,14 +7,19 @@
 extends CharacterGroundMoveState;
 
 func start() -> void:
-	# Run the base class's start() first to cache the character reference.
 	super.start();
 	
 	# Play the run animation.
 	_character.animator.play( 'run' );
 	
-	# Set this tier's target horizontal speed (used by the base class's physics_process).
+	# Set this tier's target horizontal speed.
 	_speed = CharacterController.RUN_SPEED;
+	
+	# One-time dash burst in the current facing / input direction.
+	var direction := _character.get_move_axis();
+	if direction != 0.0:
+		# Add burst on top of current velocity, clamped so it doesn't become extreme.
+		_character.velocity.x += signf( direction ) * CharacterController.RUN_BURST_SPEED;
 
 func process( delta: float ) -> void:
 	var direction := _character.get_move_axis();

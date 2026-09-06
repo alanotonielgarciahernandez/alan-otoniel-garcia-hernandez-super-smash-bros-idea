@@ -8,6 +8,7 @@
 [ext_resource type="Script" uid="uid://ccdla722f8tph" path="res://state/character_states/character_state_jump.gd" id="4_b1u1o"]
 [ext_resource type="Script" uid="uid://kv230paw03dp" path="res://state/character_states/character_state_jog.gd" id="5_bnq0n"]
 [ext_resource type="Script" uid="uid://bkuf6dnf4jf6c" path="res://state/character_states/character_state_fall.gd" id="5_ke030"]
+[ext_resource type="Script" uid="uid://fsg6t61sov1i" path="res://state/character_states/character_state_jump_squat.gd" id="7_i1355"]
 [ext_resource type="Script" uid="uid://bwtd0fcc50ncq" path="res://state/character_states/character_state_land.gd" id="7_qulg7"]
 [ext_resource type="Texture2D" uid="uid://c3xsas6sbyugi" path="res://sprites/Sheets/2DPCT_Idle.png" id="7_vliyq"]
 [ext_resource type="Texture2D" uid="uid://cikixr23drgje" path="res://sprites/Sheets/2DPCT_Jump.png" id="8_qulg7"]
@@ -291,6 +292,9 @@ script = ExtResource("5_bnq0n")
 
 [node name="CharacterStateRun" type="Node" parent="StateMachine" unique_id=152681035]
 script = ExtResource("3_mdkfl")
+
+[node name="CharacterStateJumpSquat" type="Node" parent="StateMachine" unique_id=314327970]
+script = ExtResource("7_i1355")
 
 [node name="CharacterStateJump" type="Node" parent="StateMachine" unique_id=1928691271]
 script = ExtResource("4_b1u1o")

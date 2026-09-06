@@ -15,7 +15,7 @@ func start() -> void:
 	
 	# Consume a buffered jump input from just before landing/entering idle.
 	if _character.consume_buffered_input( 'jump' ):
-		state_machine.transition_to( 'CharacterStateJump' );
+		state_machine.transition_to( 'CharacterStateJumpSquat' );
 		return;
 
 func process( _delta: float ) -> void:
@@ -26,7 +26,7 @@ func process( _delta: float ) -> void:
 		return;
 	
 	if _character.is_jump_just_pressed():
-		state_machine.transition_to( 'CharacterStateJump' );
+		state_machine.transition_to( 'CharacterStateJumpSquat' );
 		return;
 	
 	if not _character.is_on_floor():

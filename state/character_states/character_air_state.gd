@@ -15,11 +15,11 @@ func physics_process( delta: float ) -> void:
 	var target_velocity_x: float = direction * CharacterController.AIR_SPEED;
 	
 	if absf( direction ) > 0.01:
-		# Player is holding a direction — accelerate toward the tier speed.
+		# Player is holding a direction — accelerate with air-specific rate.
 		_character.velocity.x = move_toward(
 			_character.velocity.x,
 			target_velocity_x,
-			CharacterController.ACCELERATION_SPEED * delta
+			CharacterController.AIR_ACCELERATION * delta
 		);
 	else:
 		# No meaningful input — apply air friction / traction.

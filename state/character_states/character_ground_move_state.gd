@@ -18,13 +18,13 @@ func start() -> void:
 	# Consume a buffered jump input from just before entering this move state.
 	if _character.consume_buffered_input( 'jump' ):
 		# A jump was queued — go straight to Jump instead of staying here.
-		state_machine.transition_to( 'CharacterStateJump' );
+		state_machine.transition_to( 'CharacterStateJumpSquat' );
 		return;
 
 func process( _delta: float ) -> void:
 	# Jump was pressed this frame — switch to Jump.
 	if _character.is_jump_just_pressed():
-		state_machine.transition_to( 'CharacterStateJump' );
+		state_machine.transition_to( 'CharacterStateJumpSquat' );
 		return;
 	
 	# No longer on the floor — switch to Fall.

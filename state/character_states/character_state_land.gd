@@ -28,7 +28,7 @@ func process( _delta: float ) -> void:
 	# pressed at any point during landing lag isn't missed.
 	if _character.consume_buffered_input( 'jump' ):
 		# A jump was queued during recovery — go straight to Jump.
-		state_machine.transition_to( 'CharacterStateJump' );
+		state_machine.transition_to( 'CharacterStateJumpSquat' );
 		return;
 	
 	# Advance the recovery timer for this frame.

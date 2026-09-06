@@ -12,55 +12,62 @@ extends CharacterBody2D;
 ## Time window (seconds) an input remains "buffered" before it's considered stale.
 const INPUT_BUFFER_WINDOW: float = 0.15;
 
+## Acceleration applied to all grounded movement tiers (units/sec²).
+## Currently shared across Walk/Jog/Run — see earlier note about giving
+## Run a snappier acceleration later to better match Smash's dash feel.
+const ACCELERATION_SPEED: float = JOG_SPEED * 6.0;
+
+## Analog magnitude below which movement counts as Walk instead of Jog.
+const WALK_MAGNITUDE_THRESHOLD: float = 0.5;
+
 ## Walking speed (analog partial tilt only).
 const WALK_SPEED: float = 100.0;
 
 ## Jogging speed (default tier — keyboard's only tier without dashing).
 const JOG_SPEED: float = 200.0;
 
-## Running speed (reached via a dash trigger).
-const RUN_SPEED: float = 320.0;
-
-## Speed applied when character is in air.
-const AIR_SPEED: float = 200.0;
-
-## Acceleration applied to all grounded movement tiers (units/sec²).
-## Currently shared across Walk/Jog/Run — see earlier note about giving
-## Run a snappier acceleration later to better match Smash's dash feel.
-const ACCELERATION_SPEED: float = JOG_SPEED * 6.0;
+## Magnitude considered "full tilt" — required (plus a dash trigger) to enter Run.
+const RUN_MAGNITUDE_THRESHOLD: float = 0.9;
 
 ## Extra horizontal speed applied once when entering Run from a dash.
 ## Makes the initial dash feel snappy.
 const RUN_BURST_SPEED: float = 80.0;
 
+## Running speed (reached via a dash trigger).
+const RUN_SPEED: float = 320.0;
+
 ## Ground friction / traction (units per second²).
 ## Higher = stops faster.
 const GROUND_FRICTION: float = 1800.0;
+
+## Horizontal acceleration while airborne (units per second²).
+## Lower than grounded acceleration so air drift feels less snappy than running.
+## ~0.5× ground accel is a solid Smash-like starting point.
+const AIR_ACCELERATION: float = ACCELERATION_SPEED * 0.5;
+
+## Speed applied when character is in air.
+const AIR_SPEED: float = 200.0;
 
 ## Air friction / traction (units per second²).
 ## Higher = stops faster
 const AIR_FRICTION: float = 200.0;
 
-## Analog magnitude below which movement counts as Walk instead of Jog.
-const WALK_MAGNITUDE_THRESHOLD: float = 0.5;
-
-## Magnitude considered "full tilt" — required (plus a dash trigger) to enter Run.
-const RUN_MAGNITUDE_THRESHOLD: float = 0.9;
-
 ## Time allowed for the character to perform a ground jump after leaving the floor.
 const COYOTE_TIME: float = 0.12;
+
+## Duration of the grounded jumpsquat (seconds).
+## Ultimate uses 3 frames ≈ 0.05 s at 60 FPS for almost every character.
+const JUMP_SQUAT_TIME: float = 0.05;
+
+## Short hop vertical velocity.
+## Roughly 0.55–0.6× full hop is a good Smash-like starting ratio.
+const SHORT_HOP_VELOCITY: float = -280.0;
 
 ## Jump Velocity.
 const JUMP_VELOCITY: float = -500.0;
 
 ## Maximum number of jumps allowed before touching the ground again
 const MAX_JUMPS: int = 2;
-
-## How long the player can hold the jump button to keep going up (seconds)
-const JUMP_HOLD_TIME: float = 0.25;
-
-## Multiplier applied when the jump button is released early
-const JUMP_CUT_MULTIPLIER: float = 0.6;
 
 ## Maximum speed at which the player can fall.
 const TERMINAL_VELOCITY: float = 220.0;

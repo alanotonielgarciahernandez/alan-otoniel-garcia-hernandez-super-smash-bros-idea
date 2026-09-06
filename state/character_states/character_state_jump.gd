@@ -11,51 +11,33 @@ extends CharacterAirState;
 const CORNER_CORRECTION: float = 6.0;
 
 func start() -> void:
-	# Run the base class's start() first to cache the character reference.
 	super.start();
 	
-	# Play jump animation.
 	_character.animator.play( 'jump' );
 	
-	# If we're past the Coyote Time window and haven't jumped yet, the free
-	# ground jump chance is gone — this jump must consume the first charge.
-	if not _character.is_on_floor() and _character.falling_timer >= CharacterController.COYOTE_TIME and _character.jumps_used == 0:
-		_character.jumps_used = 1;
-	
-	# Consume a jump for this jump action.
-	_character.jumps_used += 1;
-	
-	# Jump.
-	_character.velocity.y = CharacterController.JUMP_VELOCITY;
-	
-	# Setup jump hold timer.
-	_character.jump_hold_timer = CharacterController.JUMP_HOLD_TIME;
+	# Only consume / set velocity when this is an aerial jump
+	# (grounded jumps already did it in JumpSquat).
+	if not _character.is_on_floor():
+		# Coyote / double jump handling (keep your existing logic).
+		if _character.falling_timer >= CharacterController.COYOTE_TIME and _character.jumps_used == 0:
+			_character.jumps_used = 1;
+		
+		_character.jumps_used += 1;
+		_character.velocity.y = CharacterController.JUMP_VELOCITY;
 
 func physics_process( delta: float ) -> void:
 	super.physics_process( delta );
 	
-	# Keep applying upward velocity while the button is held.
-	# This makes the _character continue trying to go up even if it hits a ceiling.
-	if _character.is_jump_pressed() and _character.jump_hold_timer > 0.0:
-		# Jump.
-		_character.velocity.y = CharacterController.JUMP_VELOCITY;
-		
-		# Consume jump hold timer.
-		_character.jump_hold_timer -= delta;
-	else:
-		# Button released early → cut vertical momentum.
-		if _character.velocity.y < 0.0:
-			_character.velocity.y *= CharacterController.JUMP_CUT_MULTIPLIER;
-		
-		# Change state to Fall.
-		state_machine.transition_to( 'CharacterStateFall' );
+	# Inside Jump.physics_process, after the hold/cut logic or near the top
+	if _character.is_jump_just_pressed() and _character.jumps_used < CharacterController.MAX_JUMPS:
+		state_machine.transition_to( 'CharacterStateJump', true );
 		return;
 	
 	# Safety: if we somehow start falling while still in Jump, change state to Fall.
 	if _character.velocity.y > 0.0:
 		state_machine.transition_to( 'CharacterStateFall' );
 		return;
-		
+	
 	_try_corner_correction();
 	
 	# Check for landing only after this frame's collision is resolved.

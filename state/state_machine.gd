@@ -54,9 +54,9 @@ func _unhandled_input( event: InputEvent ) -> void:
 #endregion
 
 ## Executes current state end method and changes to new state.
-func transition_to( new_state: String ) -> void:
-	# Skip no-op transitions so we don't restart the current state's animation.
-	if current_state and current_state.name == new_state:
+func transition_to( new_state: String, force: bool = false ) -> void:
+	# Skip no-op transitions if not forcing, so we don't restart the current state's animation.
+	if current_state and current_state.name == new_state and not force:
 		return;
 	
 	# End the current state before switching, if one is active.

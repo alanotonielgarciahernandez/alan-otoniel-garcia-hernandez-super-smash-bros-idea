@@ -89,9 +89,6 @@ var _buffered_inputs: Dictionary = {};
 ## Number of jumps performed since the character was last on the floor.
 var jumps_used: int = 0;
 
-## Timer that is consumed by the Jump state to stop jumping.
-var jump_hold_timer: float = 0.0;
-
 ## Timer that keeps track of the amount of time character has been in air.
 var falling_timer: float = 0.0;
 

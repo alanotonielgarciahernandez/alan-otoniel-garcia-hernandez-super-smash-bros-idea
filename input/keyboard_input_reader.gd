@@ -10,6 +10,8 @@ extends InputReader;
 func _init() -> void:
 	# TODO: Default bindings — overwritten later if a save file exists.
 	_bindings = {
+		'move_up': KEY_UP,
+		'move_down': KEY_DOWN,
 		'move_left': KEY_LEFT,
 		'move_right': KEY_RIGHT,
 		'jump': KEY_SPACE,
@@ -33,6 +35,11 @@ func get_move_axis() -> float:
 	var left := 1.0 if is_action_pressed( 'move_left' ) else 0.0;
 	var right := 1.0 if is_action_pressed( 'move_right' ) else 0.0;
 	return right - left;
+
+func get_vertical_axis() -> float:
+	var up := 1.0 if is_action_pressed( 'move_up' ) else 0.0;
+	var down := 1.0 if is_action_pressed( 'move_down' ) else 0.0;
+	return down - up;
 
 func _arms_dash_continuously() -> bool:
 	# Digital: only counts as a dash on an explicit release -> press.

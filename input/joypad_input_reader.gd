@@ -38,6 +38,10 @@ func get_move_axis() -> float:
 	var raw := Input.get_joy_axis( device, JOY_AXIS_LEFT_X );
 	return raw if absf( raw ) >= DEADZONE else 0.0;
 
+func get_vertical_axis() -> float:
+	var raw := Input.get_joy_axis( device, JOY_AXIS_LEFT_Y );
+	return raw if absf( raw ) >= DEADZONE else 0.0;
+
 func _arms_dash_continuously() -> bool:
 	# Analog: keep re-arming while near neutral, so even a first quick
 	# flick from a stand-still counts as a dash trigger.

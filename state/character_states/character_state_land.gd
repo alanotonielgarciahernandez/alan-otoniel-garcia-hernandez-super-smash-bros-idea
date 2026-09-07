@@ -1,11 +1,11 @@
 # res://state/character_states/character_state_land.gd
 # Landing recovery state.
 #
-# It recharges jumps and zeros horizontal velocity.
-# It stays inactionable for land lag, but a buffered jump can cancel out.
-# It then enters a ground move tier or Idle, or Fall if pushed off.
+# Soft vs hard lag is chosen from fall speed / fast-fall.
+# Horizontal momentum is kept and slowed by ground friction (Smash-like).
+# Buffered jump can cancel the recovery at any time.
 
-extends CharacterState
+extends CharacterState;
 
 func start() -> void:
 	# Run the base class's start() first to cache the character reference.
@@ -17,45 +17,58 @@ func start() -> void:
 	# Recharge jumps.
 	_character.recharge_jumps();
 	
-	# Set horizontal velocity to 0.
-	_character.velocity.x = 0.0;
+	# Decide soft vs hard lag BEFORE clearing the fast-fall flag.
+	# Fast-fall is the most reliable signal for a hard landing in Smash.
+	var is_hard_land: bool = _character.is_fast_falling;
 	
-	# Reset land timer before start recovering.
-	_character.land_timer = 0;
+	# Also treat near-terminal fall speed as hard (in case fast-fall flag was missed).
+	# Note: velocity.y is often already reduced by move_and_slide, so this is only a backup.
+	if _character.velocity.y >= CharacterController.TERMINAL_VELOCITY * 0.85:
+		is_hard_land = true;
+	
+	if is_hard_land:
+		_character.land_timer = CharacterController.LAND_TIME_HARD;
+	else:
+		_character.land_timer = CharacterController.LAND_TIME_SOFT;
+	
+	# Now it is safe to clear the flag.
+	_character.is_fast_falling = false;
 
 func process( _delta: float ) -> void:
-	# Check for a buffered jump every frame during recovery, so an input
-	# pressed at any point during landing lag isn't missed.
+	# Buffered jump can cancel landing lag at any time.
 	if _character.consume_buffered_input( 'jump' ):
-		# A jump was queued during recovery — go straight to Jump.
 		state_machine.transition_to( 'CharacterStateJumpSquat' );
 		return;
 	
-	# Advance the recovery timer for this frame.
-	_character.land_timer += _delta;
+	# Count down remaining recovery.
+	_character.land_timer -= _delta;
 	
-	# Still within the recovery window — stay in Land, don't check movement yet.
-	if _character.land_timer < CharacterController.LAND_TIME:
+	# Still recovering — stay in Land.
+	if _character.land_timer > 0.0:
 		return;
 	
-	# Recovery finished — read input to decide where to go next.
+	# Recovery finished — choose next grounded state.
 	var direction := _character.get_move_axis();
 	
-	# Player is holding a direction — move straight into the matching ground tier.
 	if direction != 0.0:
 		state_machine.transition_to( _character.get_ground_move_state( direction ) );
 		return;
 	
-	# No input — settle into Idle.
 	state_machine.transition_to( 'CharacterStateIdle' );
 
 func physics_process( delta: float ) -> void:
-	# Apply gravity.
+	# Apply ground friction so residual horizontal speed fades naturally.
+	_character.velocity.x = move_toward(
+		_character.velocity.x,
+		0.0,
+		CharacterController.GROUND_FRICTION * delta
+	);
+	
+	# Apply gravity (safety while grounded).
 	_character.apply_gravity( delta );
 	
 	_character.move_and_slide();
 	
-	# Safety: if we're no longer on the floor (e.g. pushed off a ledge during
-	# landing recovery), fall instead of getting stuck in the land animation.
+	# Safety: pushed off a ledge during recovery → Fall.
 	if not _character.is_on_floor():
 		state_machine.transition_to( 'CharacterStateFall' );

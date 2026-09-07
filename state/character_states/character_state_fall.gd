@@ -17,6 +17,13 @@ func start() -> void:
 func physics_process( delta: float ) -> void:
 	super.physics_process( delta );
 	
+	# Fast-fall: only possible while already falling, press down to activate.
+	# Once on, it stays on until landing.
+	if not _character.is_fast_falling and _character.velocity.y > 0.0:
+		if _character.is_down_pressed():
+			_character.is_fast_falling = true;
+			_character.velocity.y = CharacterController.FAST_FALL_SPEED;
+	
 	# Double/extra jump (Jump state will consume a charge).
 	if _character.is_jump_just_pressed() and _character.jumps_used < CharacterController.MAX_JUMPS:
 		state_machine.transition_to( 'CharacterStateJump' );

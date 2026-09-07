@@ -35,6 +35,10 @@ var _dash_window_armed: bool = false;
 func get_move_axis() -> float:
 	return 0.0;
 
+## Returns vertical input axis (-1.0 to 1.0). Overridden per device.
+func get_vertical_axis() -> float:
+	return 0.0;
+
 ## Returns horizontal input magnitude (0.0 to 1.0).
 func get_move_magnitude() -> float:
 	return absf( get_move_axis() );

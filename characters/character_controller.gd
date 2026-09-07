@@ -69,11 +69,17 @@ const JUMP_VELOCITY: float = -500.0;
 ## Maximum number of jumps allowed before touching the ground again
 const MAX_JUMPS: int = 2;
 
-## Maximum speed at which the player can fall.
+## Maximum speed at which the player can normally fall.
 const TERMINAL_VELOCITY: float = 220.0;
 
-## How long the player will recover from falling.
-const LAND_TIME: float = 0.12;
+## Fast-fall maximum fall speed.
+const FAST_FALL_SPEED: float = 360.0;
+
+## Soft landing recovery (normal fall / short hop). ~4–5 frames.
+const LAND_TIME_SOFT: float = 0.07;
+
+## Hard landing recovery (fast-fall or high fall speed). ~10–12 frames.
+const LAND_TIME_HARD: float = 0.18;
 
 ## Character Animator object reference.
 @export var animator: AnimatedSprite2D;
@@ -91,6 +97,9 @@ var jumps_used: int = 0;
 
 ## Timer that keeps track of the amount of time character has been in air.
 var falling_timer: float = 0.0;
+
+## Whether the character is currently fast-falling.
+var is_fast_falling: bool = false;
 
 ## Timer that keeps track of the amount of time character has been recovering from falling.
 var land_timer: float = 0.0;
@@ -118,6 +127,10 @@ func _unhandled_input( event: InputEvent ) -> void:
 	if _input_reader.is_action_press_event( 'jump', event ):
 		buffer_input( 'jump' );
 
+
+## Whether the down direction is pressed past a threshold on this device.
+func is_down_pressed() -> bool:
+	return _input_reader.get_vertical_axis() > 0.5;
 
 ## Whether jump was pressed this frame, from this character's assigned device only.
 func is_jump_just_pressed() -> bool:
@@ -175,6 +188,7 @@ func clear_buffered_input( action: String ) -> void:
 func recharge_jumps() -> void:
 	jumps_used = 0;
 
-## Applies gravity to vertical velocity, clamped to terminal velocity.
+## Applies gravity to vertical velocity, clamped to the correct terminal speed.
 func apply_gravity( delta: float ) -> void:
-	velocity.y = minf( TERMINAL_VELOCITY, velocity.y + get_gravity().y * delta );
+	var max_fall: float = FAST_FALL_SPEED if is_fast_falling else TERMINAL_VELOCITY;
+	velocity.y = minf( max_fall, velocity.y + get_gravity().y * delta );

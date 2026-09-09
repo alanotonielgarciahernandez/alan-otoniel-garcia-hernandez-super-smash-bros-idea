@@ -21,11 +21,6 @@ func start() -> void:
 	# Fast-fall is the most reliable signal for a hard landing in Smash.
 	var is_hard_land: bool = _character.is_fast_falling;
 	
-	# Also treat near-terminal fall speed as hard (in case fast-fall flag was missed).
-	# Note: velocity.y is often already reduced by move_and_slide, so this is only a backup.
-	if _character.velocity.y >= CharacterController.TERMINAL_VELOCITY * 0.85:
-		is_hard_land = true;
-	
 	if is_hard_land:
 		_character.land_timer = CharacterController.LAND_TIME_HARD;
 	else:

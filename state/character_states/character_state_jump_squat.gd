@@ -13,6 +13,9 @@ func start() -> void:
 	# Run the base class's start() first to cache the character reference.
 	super.start();
 	
+	# Any new jump cancels fast-fall.
+	_character.is_fast_falling = false;
+	
 	# Optional: play a jumpsquat / crouch animation if you have one.
 	# _character.animator.play( 'jump_squat' );
 	

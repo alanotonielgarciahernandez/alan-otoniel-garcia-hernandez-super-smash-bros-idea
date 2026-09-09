@@ -12,6 +12,9 @@ const CORNER_CORRECTION: float = 6.0;
 func start() -> void:
 	super.start();
 	
+	# Any new jump cancels fast-fall.
+	_character.is_fast_falling = false;
+	
 	_character.animator.play( 'jump' );
 	
 	# Only consume / set velocity when this is an aerial jump

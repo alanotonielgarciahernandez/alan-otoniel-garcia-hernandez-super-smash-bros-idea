@@ -20,5 +20,9 @@ shape = SubResource("RectangleShape2D_g4v7s")
 [node name="Brawler" parent="." unique_id=607234549 instance=ExtResource("2_h2yge")]
 position = Vector2(135, -70)
 
+[node name="Brawler2" parent="." unique_id=1363997536 instance=ExtResource("2_h2yge")]
+position = Vector2(454, -73)
+device_id = 0
+
 [node name="Camera" parent="." unique_id=1712798942 instance=ExtResource("3_h2yge")]
 position = Vector2(300, 0)

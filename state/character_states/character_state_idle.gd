@@ -29,6 +29,10 @@ func process( _delta: float ) -> void:
 		state_machine.transition_to( 'CharacterStateJumpSquat' );
 		return;
 	
+	if _character.is_attack_just_pressed():
+		state_machine.transition_to( 'CharacterStateJab' );
+		return;
+	
 	if not _character.is_on_floor():
 		state_machine.transition_to( 'CharacterStateFall' );
 		return;

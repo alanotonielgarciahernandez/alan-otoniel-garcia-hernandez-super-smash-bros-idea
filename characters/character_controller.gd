@@ -104,6 +104,9 @@ var is_fast_falling: bool = false;
 ## Timer that keeps track of the amount of time character has been recovering from falling.
 var land_timer: float = 0.0;
 
+## Current damage percent (Smash-style). Starts at 0.
+var percent: float = 0.0;
+
 ## Device-specific input reader, created once in _ready() based on device_id.
 ## Never re-evaluated afterward — this character always listens to only this device.
 var _input_reader: InputReader;
@@ -139,6 +142,14 @@ func is_jump_just_pressed() -> bool:
 ## Whether jump is currently held, from this character's assigned device only.
 func is_jump_pressed() -> bool:
 	return _input_reader.is_action_pressed( 'jump' );
+
+## Whether attack was pressed this frame, from this character's assigned device only.
+func is_attack_just_pressed() -> bool:
+	return _input_reader.is_action_just_pressed( 'attack' );
+
+## Whether attack is currently held, from this character's assigned device only.
+func is_attack_pressed() -> bool:
+	return _input_reader.is_action_pressed( 'attack' );
 
 ## Returns this character's horizontal input axis, from its assigned device only.
 func get_move_axis() -> float:

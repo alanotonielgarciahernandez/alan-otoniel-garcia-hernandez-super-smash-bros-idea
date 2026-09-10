@@ -15,6 +15,8 @@
 [ext_resource type="Texture2D" uid="uid://bdxviplm8gkno" path="res://sprites/Sheets/2DPCT_Run.png" id="9_4kffy"]
 [ext_resource type="Texture2D" uid="uid://ctbxna14w1ft" path="res://sprites/Sheets/2DPCT_Jog.png" id="12_3h56x"]
 [ext_resource type="Texture2D" uid="uid://by1ano2ag7xgl" path="res://sprites/Sheets/2DPCT_Walk.png" id="14_i1355"]
+[ext_resource type="Script" uid="uid://dorwexs0go6tc" path="res://state/character_states/character_state_jab.gd" id="16_qnu6j"]
+[ext_resource type="Script" uid="uid://bnndf60rtailf" path="res://data/moves/move_data.gd" id="17_e3kty"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_lgekj"]
 height = 40.0
@@ -270,6 +272,18 @@ animations = [{
 "speed": 5.0
 }]
 
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_g4v7s"]
+height = 40.0
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_yf5fn"]
+height = 40.0
+
+[sub_resource type="Resource" id="Resource_g4v7s"]
+script = ExtResource("17_e3kty")
+move_name = "jab"
+animation_name = "idle"
+metadata/_custom_type_script = "uid://bnndf60rtailf"
+
 [node name="Character" type="CharacterBody2D" unique_id=607234549 node_paths=PackedStringArray("animator")]
 script = ExtResource("1_ke030")
 animator = NodePath("AnimatedSprite2D")
@@ -277,6 +291,30 @@ metadata/launch_direction = Vector2(0, 0)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=138225110]
 shape = SubResource("CapsuleShape2D_lgekj")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1060728405]
+texture_filter = 1
+scale = Vector2(2.41, 2.41)
+sprite_frames = SubResource("SpriteFrames_g4v7s")
+animation = &"walk"
+
+[node name="Hurtbox" type="Area2D" parent="." unique_id=1454179522]
+collision_layer = 128
+collision_mask = 0
+monitoring = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox" unique_id=1435135973]
+shape = SubResource("CapsuleShape2D_g4v7s")
+
+[node name="Hitboxes" type="Node2D" parent="." unique_id=490979002]
+
+[node name="Jab" type="Area2D" parent="Hitboxes" unique_id=1367793822]
+position = Vector2(30, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitboxes/Jab" unique_id=871394853]
+rotation = 1.5707964
+shape = SubResource("CapsuleShape2D_yf5fn")
+disabled = true
 
 [node name="StateMachine" parent="." unique_id=2001641582 node_paths=PackedStringArray("initial_state") instance=ExtResource("1_54qew")]
 initial_state = NodePath("CharacterStateIdle")
@@ -305,8 +343,7 @@ script = ExtResource("5_ke030")
 [node name="CharacterStateLand" type="Node" parent="StateMachine" unique_id=1152350941]
 script = ExtResource("7_qulg7")
 
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1060728405]
-texture_filter = 1
-scale = Vector2(2.41, 2.41)
-sprite_frames = SubResource("SpriteFrames_g4v7s")
-animation = &"walk"
+[node name="CharacterStateJab" type="Node" parent="StateMachine" unique_id=240762818 node_paths=PackedStringArray("hitbox")]
+script = ExtResource("16_qnu6j")
+move_data = SubResource("Resource_g4v7s")
+hitbox = NodePath("../../Hitboxes/Jab")

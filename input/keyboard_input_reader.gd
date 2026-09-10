@@ -15,6 +15,7 @@ func _init() -> void:
 		'move_left': KEY_LEFT,
 		'move_right': KEY_RIGHT,
 		'jump': KEY_SPACE,
+		'attack': KEY_E,
 	};
 
 func is_action_pressed( action: String ) -> bool:

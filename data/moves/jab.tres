@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="MoveData" format=3 uid="uid://lw45ptgfest"]
+
+[ext_resource type="Script" uid="uid://bnndf60rtailf" path="res://data/moves/move_data.gd" id="1_igfqj"]
+
+[resource]
+script = ExtResource("1_igfqj")
+move_name = "jab"
+animation_name = "idle"
+metadata/_custom_type_script = "uid://bnndf60rtailf"

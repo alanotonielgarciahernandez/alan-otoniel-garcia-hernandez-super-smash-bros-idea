@@ -1,8 +1,6 @@
 # res://data/moves/move_data.gd
 # Shared frame data for a single attack.
 #
-# Times are in seconds (consistent with the rest of the project).
-# Knockback uses a simplified Smash-style formula on hit.
 
 class_name MoveData;
 extends Resource;
@@ -10,14 +8,14 @@ extends Resource;
 ## Name used for debug / UI (optional).
 @export var move_name: String = '';
 
-## Time before the hitbox turns on.
-@export var startup_time: float = 0.08;
+## Frames before the hitbox turns on.
+@export var startup_frames: int = 5;
 
-## How long the hitbox stays active.
-@export var active_time: float = 0.05;
+## How many frames the hitbox stays active.
+@export var active_frames: int = 3;
 
-## Time after the hitbox turns off before the state ends.
-@export var endlag_time: float = 0.15;
+## Frames after the hitbox turns off before the state ends.
+@export var endlag_frames: int = 9;
 
 ## Damage percent added to the target on hit.
 @export var damage: float = 3.0;
@@ -31,8 +29,8 @@ extends Resource;
 ## Launch angle in degrees. 0 = forward, 90 = straight up.
 @export var angle_degrees: float = 45.0;
 
-## Hitlag (freeze) duration for both attacker and target on hit.
-@export var hitlag_time: float = 0.06;
+## Hitlag (freeze) frames for both attacker and target on hit.
+@export var hitlag_frames: int = 4;
 
 ## Animation to play on the character when this move starts.
-@export var animation_name: String = 'jab';
+@export var animation_name: String = 'idle';

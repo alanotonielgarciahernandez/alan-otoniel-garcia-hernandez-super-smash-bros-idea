@@ -21,7 +21,7 @@ func start() -> void:
 	# (grounded jumps already did it in JumpSquat).
 	if not _character.is_on_floor():
 		# Coyote / double jump handling (keep your existing logic).
-		if _character.falling_timer >= CharacterController.COYOTE_TIME and _character.jumps_used == 0:
+		if _character.falling_frames >= CharacterController.COYOTE_TIME and _character.jumps_used == 0:
 			_character.jumps_used = 1;
 		
 		_character.jumps_used += 1;

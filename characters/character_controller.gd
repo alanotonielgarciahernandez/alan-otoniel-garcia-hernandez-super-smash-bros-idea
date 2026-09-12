@@ -9,8 +9,8 @@ class_name CharacterController;
 extends CharacterBody2D;
 
 
-## Time window (seconds) an input remains "buffered" before it's considered stale.
-const INPUT_BUFFER_WINDOW: float = 0.15;
+## Frame window an input remains "buffered" before it's considered stale.
+const INPUT_BUFFER_WINDOW: int = 9;
 
 ## Acceleration applied to all grounded movement tiers (units/sec²).
 ## Currently shared across Walk/Jog/Run — see earlier note about giving
@@ -52,12 +52,11 @@ const AIR_SPEED: float = 200.0;
 ## Higher = stops faster
 const AIR_FRICTION: float = 200.0;
 
-## Time allowed for the character to perform a ground jump after leaving the floor.
-const COYOTE_TIME: float = 0.12;
+## Frames allowed for the character to perform a ground jump after leaving the floor.
+const COYOTE_TIME: int = 7;
 
-## Duration of the grounded jumpsquat (seconds).
-## Ultimate uses 3 frames ≈ 0.05 s at 60 FPS for almost every character.
-const JUMP_SQUAT_TIME: float = 0.05;
+## Frame duration of the grounded jumpsquat.
+const JUMP_SQUAT_FRAMES: int = 3;
 
 ## Short hop vertical velocity.
 ## Roughly 0.55–0.6× full hop is a good Smash-like starting ratio.
@@ -75,11 +74,11 @@ const TERMINAL_VELOCITY: float = 220.0;
 ## Fast-fall maximum fall speed.
 const FAST_FALL_SPEED: float = 360.0;
 
-## Soft landing recovery (normal fall / short hop). ~4–5 frames.
-const LAND_TIME_SOFT: float = 0.07;
+## Soft landing recovery (normal fall / short hop).
+const LAND_FRAMES_SOFT: int = 4;
 
-## Hard landing recovery (fast-fall or high fall speed). ~10–12 frames.
-const LAND_TIME_HARD: float = 0.18;
+## Hard landing recovery (fast-fall or high fall speed).
+const LAND_FRAMES_HARD: int = 11;
 
 ## Character Animator object reference.
 @export var animator: AnimatedSprite2D;
@@ -89,20 +88,21 @@ const LAND_TIME_HARD: float = 0.18;
 ## inspector, or a spawner/character-select screen).
 @export var device_id: int = -1;
 
-## Stores buffered actions and the time (in seconds, engine ticks) after which they expire.
+## action_name -> remaining frames the buffer is still valid.
+## 0 or missing = not buffered / expired.
 var _buffered_inputs: Dictionary = {};
 
 ## Number of jumps performed since the character was last on the floor.
 var jumps_used: int = 0;
 
-## Timer that keeps track of the amount of time character has been in air.
-var falling_timer: float = 0.0;
+## Frame count that keeps track of the amount of time character has been in air.
+var falling_frames: int = 0;
 
 ## Whether the character is currently fast-falling.
 var is_fast_falling: bool = false;
 
-## Timer that keeps track of the amount of time character has been recovering from falling.
-var land_timer: float = 0.0;
+## Frame count that keeps track of the amount of time character has been recovering from falling.
+var land_frames: int = 0;
 
 ## Current damage percent (Smash-style). Starts at 0.
 var percent: float = 0.0;
@@ -116,11 +116,14 @@ func _ready() -> void:
 	_input_reader = KeyboardInputReader.new() if device_id == -1 else JoypadInputReader.new( device_id );
 
 func _physics_process( _delta: float ) -> void:
-	# Falling timer resets if character is on floor.
+	# Falling frames reset if character is on floor.
 	if is_on_floor():
-		falling_timer = 0.0;
+		falling_frames = 0;
 	else:
-		falling_timer += _delta;
+		falling_frames += 1;
+	
+	# Count down every active input buffer by one frame.
+	_tick_input_buffers();
 	
 	# Refresh this character's input reader (just-pressed tracking, dash window).
 	_input_reader.update();
@@ -172,28 +175,50 @@ func get_ground_move_state( direction: float ) -> String:
 	return 'CharacterStateJog';
 
 ## Buffers an action so a state can consume it shortly after, even if pressed too early.
+## Resets the window to the full duration every time the action is pressed.
 func buffer_input( action: String ) -> void:
-	# Store expiration time for this action.
-	_buffered_inputs[ action ] = Time.get_ticks_msec() / 1000.0 + INPUT_BUFFER_WINDOW;
+	# Store remaining frames for this action (overwrites any previous buffer).
+	_buffered_inputs[ action ] = INPUT_BUFFER_WINDOW;
 
-## Checks if an action is still buffered (within its window) and consumes it if so.
+
+## Checks if an action is still buffered (remaining frames > 0) and consumes it if so.
+## Always erases the entry so a stale buffer can never be read twice.
 func consume_buffered_input( action: String ) -> bool:
 	# No buffered entry for this action.
 	if not _buffered_inputs.has( action ):
 		return false;
 	
-	# Get expiration time for this action.
-	var expires_at: float = _buffered_inputs[ action ];
+	# How many frames are still left on this buffer.
+	var remaining: int = _buffered_inputs[ action ];
 	
-	# Buffered input is always consumed on check, valid or not, to avoid stale reads later.
+	# Always consume (erase) on check to avoid stale reads later.
 	_buffered_inputs.erase( action );
 	
-	# Return whether it was still within its window.
-	return Time.get_ticks_msec() / 1000.0 <= expires_at;
+	# Valid only if at least one frame remained.
+	return remaining > 0;
+
 
 ## Clears a specific buffered action without consuming it (e.g. on cancel conditions).
 func clear_buffered_input( action: String ) -> void:
 	_buffered_inputs.erase( action );
+
+
+## Counts every active input buffer down by one frame.
+## Call this once per physics frame from _physics_process.
+func _tick_input_buffers() -> void:
+	# Collect keys first so we can safely erase while iterating.
+	var expired: Array[ String ] = [];
+	
+	for action in _buffered_inputs:
+		_buffered_inputs[ action ] -= 1;
+		
+		# Mark for removal once the window has fully expired.
+		if _buffered_inputs[ action ] <= 0:
+			expired.append( action );
+	
+	# Erase expired buffers after the loop.
+	for action in expired:
+		_buffered_inputs.erase( action );
 
 ## Resets the jump counter. Called explicitly by states once a landing is confirmed.
 func recharge_jumps() -> void:

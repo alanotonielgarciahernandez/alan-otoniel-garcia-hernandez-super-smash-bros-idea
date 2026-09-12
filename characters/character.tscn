@@ -281,7 +281,6 @@ height = 40.0
 [sub_resource type="Resource" id="Resource_g4v7s"]
 script = ExtResource("17_e3kty")
 move_name = "jab"
-animation_name = "idle"
 metadata/_custom_type_script = "uid://bnndf60rtailf"
 
 [node name="Character" type="CharacterBody2D" unique_id=607234549 node_paths=PackedStringArray("animator")]

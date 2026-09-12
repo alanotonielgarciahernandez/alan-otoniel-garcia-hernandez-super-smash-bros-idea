@@ -8,8 +8,8 @@
 class_name InputReader;
 extends RefCounted;
 
-## Time window to detect a dash gesture (flick or re-press).
-const RUN_INPUT_WINDOW: float = 0.15;
+## Frame window to detect a dash gesture (flick or re-press).
+const RUN_INPUT_WINDOW: int = 9;
 
 ## action_name -> binding value (Key for keyboard, JoyButton for joypad).
 var _bindings: Dictionary = {};
@@ -24,11 +24,8 @@ var _just_pressed: Dictionary = {};
 ## Whether horizontal input was neutral (near-zero) last physics frame.
 var _was_neutral: bool = true;
 
-## Timestamp the dash window was armed.
-var _neutral_since: float = 0.0;
-
-## Whether a dash trigger is currently armed and awaiting full-tilt input.
-var _dash_window_armed: bool = false;
+## Remaining frames the dash window stays armed. 0 = not armed.
+var _dash_window_frames: int = 0;
 
 
 ## Returns horizontal input axis (-1.0 to 1.0). Overridden per device.
@@ -82,12 +79,16 @@ func update() -> void:
 	
 	if _arms_dash_continuously():
 		if is_neutral:
-			_neutral_since = Time.get_ticks_msec() / 1000.0;
-			_dash_window_armed = true;
+			# Keep re-arming while neutral so a quick flick still counts.
+			_dash_window_frames = RUN_INPUT_WINDOW;
 	else:
 		if is_neutral and not _was_neutral:
-			_neutral_since = Time.get_ticks_msec() / 1000.0;
-			_dash_window_armed = true;
+			# Digital: arm only on the release → press edge.
+			_dash_window_frames = RUN_INPUT_WINDOW;
+	
+	# Count the window down every physics frame.
+	if _dash_window_frames > 0:
+		_dash_window_frames -= 1;
 	
 	_was_neutral = is_neutral;
 
@@ -95,12 +96,10 @@ func update() -> void:
 func consume_dash_trigger() -> bool:
 	var magnitude := get_move_magnitude();
 	
-	if not _dash_window_armed or magnitude < CharacterController.RUN_MAGNITUDE_THRESHOLD:
+	if _dash_window_frames <= 0 or magnitude < CharacterController.RUN_MAGNITUDE_THRESHOLD:
 		return false;
 	
-	var now := Time.get_ticks_msec() / 1000.0;
-	var triggered: bool = ( now - _neutral_since ) <= RUN_INPUT_WINDOW;
+	# Consume the window so it only fires once.
+	_dash_window_frames = 0;
 	
-	_dash_window_armed = false;
-	
-	return triggered;
+	return true;

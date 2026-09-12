@@ -4,6 +4,4 @@
 
 [resource]
 script = ExtResource("1_igfqj")
-move_name = "jab"
-animation_name = "idle"
 metadata/_custom_type_script = "uid://bnndf60rtailf"

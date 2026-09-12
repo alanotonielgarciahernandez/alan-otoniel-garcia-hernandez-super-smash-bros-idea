@@ -22,9 +22,9 @@ func start() -> void:
 	var is_hard_land: bool = _character.is_fast_falling;
 	
 	if is_hard_land:
-		_character.land_timer = CharacterController.LAND_TIME_HARD;
+		_character.land_frames = CharacterController.LAND_FRAMES_HARD;
 	else:
-		_character.land_timer = CharacterController.LAND_TIME_SOFT;
+		_character.land_frames = CharacterController.LAND_FRAMES_SOFT;
 	
 	# Now it is safe to clear the flag.
 	_character.is_fast_falling = false;
@@ -36,10 +36,10 @@ func process( _delta: float ) -> void:
 		return;
 	
 	# Count down remaining recovery.
-	_character.land_timer -= _delta;
+	_character.land_frames -= 1;
 	
 	# Still recovering — stay in Land.
-	if _character.land_timer > 0.0:
+	if _character.land_frames > 0:
 		return;
 	
 	# Recovery finished — choose next grounded state.

@@ -15,8 +15,11 @@ extends CharacterState;
 ## Phases of the attack.
 enum Phase { STARTUP, ACTIVE, ENDLAG }
 
+## Current phase of the jab.
 var _phase: Phase = Phase.STARTUP;
-var _timer: float = 0.0;
+
+## Remaining frames in the current phase.
+var _frames_left: int = 0;
 
 func start() -> void:
 	# Run the base class's start() first to cache the character reference.
@@ -33,7 +36,7 @@ func start() -> void:
 	
 	# Start in startup with hitbox off.
 	_phase = Phase.STARTUP;
-	_timer = move_data.startup_time;
+	_frames_left = move_data.startup_frames;
 	_set_hitbox_active( false );
 
 func end() -> void:
@@ -59,21 +62,22 @@ func physics_process( delta: float ) -> void:
 		state_machine.transition_to( 'CharacterStateFall' );
 		return;
 	
-	# Advance the current phase timer.
-	_timer -= delta;
+	# Count down the current phase.
+	_frames_left -= 1;
 	
-	if _timer > 0.0:
+	# Phase still has frames remaining — nothing else to do this tick.
+	if _frames_left > 0:
 		return;
 	
 	# Phase finished — move to the next one.
 	match _phase:
 		Phase.STARTUP:
 			_phase = Phase.ACTIVE;
-			_timer = move_data.active_time;
+			_frames_left = move_data.active_frames;
 			_set_hitbox_active( true );
 		Phase.ACTIVE:
 			_phase = Phase.ENDLAG;
-			_timer = move_data.endlag_time;
+			_frames_left = move_data.endlag_frames;
 			_set_hitbox_active( false );
 		Phase.ENDLAG:
 			state_machine.transition_to( 'CharacterStateIdle' );

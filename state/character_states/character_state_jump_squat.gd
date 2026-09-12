@@ -7,7 +7,7 @@
 
 extends CharacterState;
 
-var jump_squat_timer: float = 0.0;
+var jump_squat_frames: int = 0;
 
 func start() -> void:
 	# Run the base class's start() first to cache the character reference.
@@ -19,8 +19,8 @@ func start() -> void:
 	# Optional: play a jumpsquat / crouch animation if you have one.
 	# _character.animator.play( 'jump_squat' );
 	
-	# Start the jumpsquat timer.
-	jump_squat_timer = CharacterController.JUMP_SQUAT_TIME;
+	# Start the jumpsquat frame count.
+	jump_squat_frames = CharacterController.JUMP_SQUAT_FRAMES;
 
 func process( _delta: float ) -> void:
 	# Safety: if we somehow leave the floor during squat, go to Fall.
@@ -30,7 +30,7 @@ func process( _delta: float ) -> void:
 
 func physics_process( delta: float ) -> void:
 	# Count down the jumpsquat.
-	jump_squat_timer -= delta;
+	jump_squat_frames -= 1;
 	
 	# Apply gravity and friction while still grounded.
 	_character.velocity.x = move_toward(
@@ -42,7 +42,7 @@ func physics_process( delta: float ) -> void:
 	_character.move_and_slide();
 	
 	# Jumpsquat finished — decide hop type and leave the ground.
-	if jump_squat_timer <= 0.0:
+	if jump_squat_frames <= 0:
 		_finish_jumpsquat();
 
 func _finish_jumpsquat() -> void:

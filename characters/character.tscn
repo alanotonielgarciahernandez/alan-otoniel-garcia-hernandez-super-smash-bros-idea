@@ -16,7 +16,7 @@
 [ext_resource type="Texture2D" uid="uid://ctbxna14w1ft" path="res://sprites/Sheets/2DPCT_Jog.png" id="12_3h56x"]
 [ext_resource type="Texture2D" uid="uid://by1ano2ag7xgl" path="res://sprites/Sheets/2DPCT_Walk.png" id="14_i1355"]
 [ext_resource type="Script" uid="uid://dorwexs0go6tc" path="res://state/character_states/character_state_jab.gd" id="16_qnu6j"]
-[ext_resource type="Script" uid="uid://bnndf60rtailf" path="res://data/moves/move_data.gd" id="17_e3kty"]
+[ext_resource type="Resource" uid="uid://lw45ptgfest" path="res://data/moves/jab.tres" id="17_qnu6j"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_lgekj"]
 height = 40.0
@@ -278,11 +278,6 @@ height = 40.0
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_yf5fn"]
 height = 40.0
 
-[sub_resource type="Resource" id="Resource_g4v7s"]
-script = ExtResource("17_e3kty")
-move_name = "jab"
-metadata/_custom_type_script = "uid://bnndf60rtailf"
-
 [node name="Character" type="CharacterBody2D" unique_id=607234549 node_paths=PackedStringArray("animator")]
 script = ExtResource("1_ke030")
 animator = NodePath("AnimatedSprite2D")
@@ -344,5 +339,5 @@ script = ExtResource("7_qulg7")
 
 [node name="CharacterStateJab" type="Node" parent="StateMachine" unique_id=240762818 node_paths=PackedStringArray("hitbox")]
 script = ExtResource("16_qnu6j")
-move_data = SubResource("Resource_g4v7s")
+move_data = ExtResource("17_qnu6j")
 hitbox = NodePath("../../Hitboxes/Jab")

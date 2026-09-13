@@ -43,10 +43,6 @@ func end() -> void:
 	# Always turn the hitbox off when leaving this state.
 	_set_hitbox_active( false );
 
-func process( _delta: float ) -> void:
-	# Optional: allow jump-cancel later; keep empty for now.
-	pass;
-
 func physics_process( delta: float ) -> void:
 	# Keep grounded friction / gravity while attacking.
 	_character.velocity.x = move_toward(

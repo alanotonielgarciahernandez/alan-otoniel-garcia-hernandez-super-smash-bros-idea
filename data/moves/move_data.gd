@@ -1,6 +1,5 @@
 # res://data/moves/move_data.gd
 # Shared frame data for a single attack.
-#
 
 class_name MoveData;
 extends Resource;

@@ -35,9 +35,6 @@ func process( _delta: float ) -> void:
 		state_machine.transition_to( 'CharacterStateJumpSquat' );
 		return;
 	
-	# Count down remaining recovery.
-	_character.land_frames -= 1;
-	
 	# Still recovering — stay in Land.
 	if _character.land_frames > 0:
 		return;
@@ -63,6 +60,9 @@ func physics_process( delta: float ) -> void:
 	_character.apply_gravity( delta );
 	
 	_character.move_and_slide();
+	
+	# Count down remaining recovery.
+	_character.land_frames -= 1;
 	
 	# Safety: pushed off a ledge during recovery → Fall.
 	if not _character.is_on_floor():

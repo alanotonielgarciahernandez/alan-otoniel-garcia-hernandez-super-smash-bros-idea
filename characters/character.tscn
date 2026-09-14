@@ -304,6 +304,8 @@ shape = SubResource("CapsuleShape2D_g4v7s")
 
 [node name="Jab" type="Area2D" parent="Hitboxes" unique_id=1367793822]
 position = Vector2(30, 0)
+collision_layer = 0
+collision_mask = 128
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hitboxes/Jab" unique_id=871394853]
 rotation = 1.5707964

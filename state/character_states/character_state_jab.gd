@@ -2,7 +2,8 @@
 # Grounded jab attack.
 #
 # Startup → enable hitbox → active → disable hitbox → endlag → Idle.
-# Hit detection and knockback will be wired once the hitbox reports a hit.
+# Timing is counted in integer frames (design target 60 FPS).
+# Hit detection is wired; knockback / hitstun / hitlag live on the victim.
 
 extends CharacterState;
 
@@ -21,11 +22,12 @@ var _phase: Phase = Phase.STARTUP;
 ## Remaining frames in the current phase.
 var _frames_left: int = 0;
 
+
 func start() -> void:
 	# Run the base class's start() first to cache the character reference.
 	super.start();
 	
-	# Safety: no data assigned.
+	# Safety: no data assigned — abort to Idle.
 	if move_data == null:
 		state_machine.transition_to( 'CharacterStateIdle' );
 		return;
@@ -34,57 +36,114 @@ func start() -> void:
 	if move_data.animation_name != '':
 		_character.animator.play( move_data.animation_name );
 	
+	# Connect the hit signal once (safe to call repeatedly).
+	if hitbox != null and not hitbox.area_entered.is_connected( _on_hitbox_area_entered ):
+		hitbox.area_entered.connect( _on_hitbox_area_entered );
+	
 	# Start in startup with hitbox off.
 	_phase = Phase.STARTUP;
 	_frames_left = move_data.startup_frames;
 	_set_hitbox_active( false );
+	
+	# Flip the hitbox to the character's current facing.
+	_update_hitbox_facing();
+
 
 func end() -> void:
 	# Always turn the hitbox off when leaving this state.
 	_set_hitbox_active( false );
 
+
+func process( _delta: float ) -> void:
+	# Optional: allow jump-cancel or other cancels later.
+	pass;
+
+
 func physics_process( delta: float ) -> void:
-	# Keep grounded friction / gravity while attacking.
+	# Keep grounded friction while attacking so residual momentum dies naturally.
 	_character.velocity.x = move_toward(
 		_character.velocity.x,
 		0.0,
 		CharacterController.GROUND_FRICTION * delta
 	);
+	
+	# Apply gravity so the character stays planted / can fall off edges.
 	_character.apply_gravity( delta );
+	
+	# Move the character.
 	_character.move_and_slide();
 	
-	# Left the ground during jab → fall.
+	# Left the ground during jab → transition to Fall.
 	if not _character.is_on_floor():
 		state_machine.transition_to( 'CharacterStateFall' );
 		return;
 	
-	# Count down the current phase.
+	# Advance one design frame per physics tick.
 	_frames_left -= 1;
 	
-	# Phase still has frames remaining — nothing else to do this tick.
+	# Still frames left in this phase — nothing else to do.
 	if _frames_left > 0:
 		return;
 	
-	# Phase finished — move to the next one.
+	# Phase finished — advance to the next one.
 	match _phase:
 		Phase.STARTUP:
+			# Startup over → enable hitbox and start active window.
 			_phase = Phase.ACTIVE;
 			_frames_left = move_data.active_frames;
 			_set_hitbox_active( true );
 		Phase.ACTIVE:
+			# Active over → disable hitbox and start endlag.
 			_phase = Phase.ENDLAG;
 			_frames_left = move_data.endlag_frames;
 			_set_hitbox_active( false );
 		Phase.ENDLAG:
+			# Endlag over → return to Idle.
 			state_machine.transition_to( 'CharacterStateIdle' );
 
+
+## Enables or disables the jab hitbox (shape + monitoring).
 func _set_hitbox_active( active: bool ) -> void:
 	if hitbox == null:
 		return;
 	
-	# Prefer disabling the shape so the Area2D stays easy to debug.
+	# Prefer disabling the shape so the Area2D stays easy to debug in the editor.
 	for child in hitbox.get_children():
 		if child is CollisionShape2D:
 			child.disabled = not active;
 	
+	# Also toggle monitoring so the area stops reporting when inactive.
 	hitbox.monitoring = active;
+
+
+## Flips the hitbox X position to match the character's current facing.
+## Uses animator.flip_h for now; replace with a real facing variable later.
+func _update_hitbox_facing() -> void:
+	if hitbox == null:
+		return;
+	
+	# Positive X = facing right, negative = facing left.
+	var facing: float = -1.0 if _character.animator.flip_h else 1.0;
+	
+	# Keep the absolute offset and apply the sign of facing.
+	hitbox.position.x = absf( hitbox.position.x ) * facing;
+
+
+## Called when the jab hitbox overlaps another Area2D.
+func _on_hitbox_area_entered( area: Area2D ) -> void:
+	# Only react to Hurtboxes.
+	if area.name != 'Hurtbox':
+		return;
+	
+	# Resolve the CharacterController that owns this hurtbox.
+	var victim := area.get_parent() as CharacterController;
+	
+	# Ignore self-hits and non-character areas.
+	if victim == null or victim == _character:
+		return;
+	
+	# Determine launch direction from our current facing.
+	var facing: float = -1.0 if _character.animator.flip_h else 1.0;
+	
+	# Apply the hit (damage + knockback).
+	victim.apply_hit( move_data, facing );

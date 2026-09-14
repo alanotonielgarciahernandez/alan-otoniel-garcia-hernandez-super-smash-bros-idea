@@ -237,3 +237,37 @@ func recharge_jumps() -> void:
 func apply_gravity( delta: float ) -> void:
 	var max_fall: float = FAST_FALL_SPEED if is_fast_falling else TERMINAL_VELOCITY;
 	velocity.y = minf( max_fall, velocity.y + get_gravity().y * delta );
+
+
+## Applies a hit from a MoveData resource.
+## Adds percent, calculates simplified Smash-style knockback, and launches the character.
+## attacker_facing: +1 = right, -1 = left.
+func apply_hit( move: MoveData, attacker_facing: float = 1.0 ) -> void:
+	# Safety.
+	if move == null:
+		return;
+	
+	# Add damage percent.
+	percent += move.damage;
+	
+	# Knockback magnitude: base + growth scaled by current percent.
+	# Simplified formula — good feel for early testing; can later match Melee weight/ratios more closely.
+	var kb: float = move.base_knockback + ( percent * move.knockback_growth * 0.01 );
+	
+	# Launch direction from angle (0° = forward, 90° = straight up).
+	var rad: float = deg_to_rad( move.angle_degrees );
+	var dir := Vector2( cos( rad ) * attacker_facing, -sin( rad ) );
+	
+	# Apply launch velocity (overwrite current velocity — classic early fighter behaviour).
+	velocity = dir * kb;
+	
+	# Cancel fast-fall on hit.
+	is_fast_falling = false;
+	
+	# Temporary debug feedback — remove once you have UI / hit VFX.
+	print( 'Hit! percent = ', percent, '  kb = ', kb, '  angle = ', move.angle_degrees );
+	
+	# TODO next:
+	# - Enter hitstun / tumble state
+	# - Apply hitlag freeze (move.hitlag_frames)
+	# - Spawn hit spark / SFX

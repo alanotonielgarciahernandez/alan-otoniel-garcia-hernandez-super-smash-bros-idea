@@ -87,6 +87,9 @@ const LAND_FRAMES_HARD: int = 11;
 ## Maximum number of jumps allowed before touching the ground again
 const MAX_JUMPS: int = 2;
 
+## Character State Machine object reference.
+@export var state_machine: StateMachine;
+
 ## Character Animator object reference.
 @export var animator: AnimatedSprite2D;
 
@@ -118,6 +121,9 @@ var land_frames: int = 0;
 
 ## Current damage percent. Starts at 0.
 var percent: float = 0.0;
+
+## Frames of hitstun remaining after being hit. Read by CharacterStateHitstun.
+var hitstun_frames: int = 0;
 
 #endregion
 
@@ -264,10 +270,17 @@ func apply_hit( move: MoveData, attacker_facing: float = 1.0 ) -> void:
 	# Cancel fast-fall on hit.
 	is_fast_falling = false;
 	
+	# Simple hitstun length (tune later). Light jab starts around 8–12 frames.
+	# Rough rule: base + a little bit of the knockback magnitude.
+	hitstun_frames = 8 + int( kb * 0.12 );
+	
+	# Force the character into Hitstun so they cannot act immediately.
+	if state_machine:
+		state_machine.transition_to( 'CharacterStateHitstun' )
+	
 	# Temporary debug feedback — remove once you have UI / hit VFX.
 	print( 'Hit! percent = ', percent, '  kb = ', kb, '  angle = ', move.angle_degrees );
 	
 	# TODO next:
-	# - Enter hitstun / tumble state
 	# - Apply hitlag freeze (move.hitlag_frames)
 	# - Spawn hit spark / SFX

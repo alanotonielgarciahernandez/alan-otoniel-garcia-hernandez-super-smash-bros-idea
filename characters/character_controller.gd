@@ -276,7 +276,7 @@ func apply_hit( move: MoveData, attacker_facing: float = 1.0 ) -> void:
 	
 	# Force the character into Hitstun so they cannot act immediately.
 	if state_machine:
-		state_machine.transition_to( 'CharacterStateHitstun' )
+		state_machine.transition_to( 'CharacterStateHitstun' );
 	
 	# Temporary debug feedback — remove once you have UI / hit VFX.
 	print( 'Hit! percent = ', percent, '  kb = ', kb, '  angle = ', move.angle_degrees );

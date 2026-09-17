@@ -11,16 +11,23 @@ func start() -> void:
 	# Run the base class's start() first to cache the character reference.
 	super.start();
 	
+	# Safety check if f somehow hitstun_frames is already ≤ 0 when entering.
+	if _character.hitstun_frames < 1:
+		_character.hitstun_frames = 1;
+	
 	# Play hitstun animation.
 	#_character.animator.play( 'hitstun' );
 
 func physics_process( delta: float ) -> void:
-	# Apply residual launch + gravity / air friction.
+	var friction: float = CharacterController.GROUND_FRICTION if _character.is_on_floor() else CharacterController.AIR_FRICTION;
+	
+	# Apply residual friction.
 	_character.velocity.x = move_toward(
 		_character.velocity.x,
 		0.0,
-		CharacterController.AIR_FRICTION * delta
+		friction * delta
 	);
+	
 	_character.apply_gravity( delta );
 	_character.move_and_slide();
 	

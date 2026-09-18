@@ -40,12 +40,21 @@ func _state_start() -> void:
 #region Self-executed methods.
 
 func _process( delta: float ) -> void:
+	# Skip while the controlled character is in hitlag.
+	if controlled_node is CharacterController and controlled_node.hitlag_frames > 0:
+		return;
+	
 	if current_state:
 		current_state.process( delta );
 
 func _physics_process( delta: float ) -> void:
+	# Skip while the controlled character is in hitlag.
+	# Hitstun / other timers only count after the freeze ends.
+	if controlled_node is CharacterController and controlled_node.hitlag_frames > 0:
+		return;
+	
 	if current_state:
-		current_state.physics_process( delta )
+		current_state.physics_process( delta );
 
 func _unhandled_input( event: InputEvent ) -> void:
 	if current_state:

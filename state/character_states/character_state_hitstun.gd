@@ -11,7 +11,7 @@ func start() -> void:
 	# Run the base class's start() first to cache the character reference.
 	super.start();
 	
-	# Safety check if f somehow hitstun_frames is already ≤ 0 when entering.
+	# Safety check if somehow hitstun_frames is already ≤ 0 when entering.
 	if _character.hitstun_frames < 1:
 		_character.hitstun_frames = 1;
 	

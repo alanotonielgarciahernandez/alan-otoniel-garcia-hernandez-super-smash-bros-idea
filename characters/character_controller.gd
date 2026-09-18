@@ -125,6 +125,9 @@ var percent: float = 0.0;
 ## Frames of hitstun remaining after being hit. Read by CharacterStateHitstun.
 var hitstun_frames: int = 0;
 
+## Frames of hitlag remaining. While > 0 the character is frozen.
+var hitlag_frames: int = 0;
+
 #endregion
 
 
@@ -134,6 +137,11 @@ func _ready() -> void:
 	_input_reader = KeyboardInputReader.new() if device_id == -1 else JoypadInputReader.new( device_id );
 
 func _physics_process( _delta: float ) -> void:
+	# Hitlag freeze — skip everything while frozen.
+	if hitlag_frames > 0:
+		hitlag_frames -= 1;
+		return;
+	
 	# Falling frames reset if character is on floor.
 	if is_on_floor():
 		falling_frames = 0;
@@ -273,6 +281,9 @@ func apply_hit( move: MoveData, attacker_facing: float = 1.0 ) -> void:
 	# Simple hitstun length (tune later). Light jab starts around 8–12 frames.
 	# Rough rule: base + a little bit of the knockback magnitude.
 	hitstun_frames = 8 + int( kb * 0.12 );
+	
+	# Freeze this character (the victim) for the move's hitlag window.
+	hitlag_frames = move.hitlag_frames;
 	
 	# Force the character into Hitstun so they cannot act immediately.
 	if state_machine:

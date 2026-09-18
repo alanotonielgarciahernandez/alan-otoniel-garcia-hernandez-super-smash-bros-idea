@@ -16,7 +16,8 @@ var device: int;
 func _init( joypad_device: int ) -> void:
 	device = joypad_device;
 	_bindings = {
-		'jump': JOY_BUTTON_A,
+		'jump': JOY_BUTTON_Y,
+		'attack': JOY_BUTTON_A,
 	};
 	# Note: movement stays a fixed stick axis, not a rebindable button.
 

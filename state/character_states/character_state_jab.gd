@@ -147,3 +147,6 @@ func _on_hitbox_area_entered( area: Area2D ) -> void:
 	
 	# Apply the hit (damage + knockback).
 	victim.apply_hit( move_data, facing );
+	
+	# Freeze the attacker for the same hitlag window.
+	_character.hitlag_frames = move_data.hitlag_frames;

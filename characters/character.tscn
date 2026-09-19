@@ -18,6 +18,8 @@
 [ext_resource type="Script" uid="uid://dorwexs0go6tc" path="res://state/character_states/character_state_jab.gd" id="16_qnu6j"]
 [ext_resource type="Resource" uid="uid://lw45ptgfest" path="res://data/moves/jab.tres" id="17_qnu6j"]
 [ext_resource type="Script" uid="uid://bc0asnp8c3baa" path="res://state/character_states/character_state_hitstun.gd" id="18_e3kty"]
+[ext_resource type="Script" uid="uid://bt2o258mcpr33" path="res://state/character_states/character_state_forward_tilt.gd" id="19_4unn8"]
+[ext_resource type="Resource" uid="uid://cr7dvwdhpmppv" path="res://data/moves/forward_tilt.tres" id="20_5fe2j"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_lgekj"]
 height = 40.0
@@ -279,6 +281,9 @@ height = 40.0
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_yf5fn"]
 height = 40.0
 
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_5fe2j"]
+height = 60.0
+
 [node name="Character" type="CharacterBody2D" unique_id=607234549 node_paths=PackedStringArray("state_machine", "animator")]
 script = ExtResource("1_ke030")
 state_machine = NodePath("StateMachine")
@@ -314,6 +319,17 @@ rotation = 1.5707964
 shape = SubResource("CapsuleShape2D_yf5fn")
 disabled = true
 
+[node name="ForwardTilt" type="Area2D" parent="Hitboxes" unique_id=687838707]
+position = Vector2(30, 0)
+collision_layer = 0
+collision_mask = 128
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitboxes/ForwardTilt" unique_id=1655168189]
+position = Vector2(10, 0)
+rotation = 1.5707964
+shape = SubResource("CapsuleShape2D_5fe2j")
+disabled = true
+
 [node name="StateMachine" parent="." unique_id=2001641582 node_paths=PackedStringArray("initial_state") instance=ExtResource("1_54qew")]
 initial_state = NodePath("CharacterStateIdle")
 
@@ -341,10 +357,15 @@ script = ExtResource("5_ke030")
 [node name="CharacterStateLand" type="Node" parent="StateMachine" unique_id=1152350941]
 script = ExtResource("7_qulg7")
 
+[node name="CharacterStateHitstun" type="Node" parent="StateMachine" unique_id=1191051004]
+script = ExtResource("18_e3kty")
+
 [node name="CharacterStateJab" type="Node" parent="StateMachine" unique_id=240762818 node_paths=PackedStringArray("hitbox")]
 script = ExtResource("16_qnu6j")
 move_data = ExtResource("17_qnu6j")
 hitbox = NodePath("../../Hitboxes/Jab")
 
-[node name="CharacterStateHitstun" type="Node" parent="StateMachine" unique_id=1191051004]
-script = ExtResource("18_e3kty")
+[node name="CharacterStateForwardTilt" type="Node" parent="StateMachine" unique_id=290387880 node_paths=PackedStringArray("hitbox")]
+script = ExtResource("19_4unn8")
+move_data = ExtResource("20_5fe2j")
+hitbox = NodePath("../../Hitboxes/ForwardTilt")

@@ -25,4 +25,8 @@ func process( delta: float ) -> void:
 		state_machine.transition_to( _character.get_ground_move_state( direction ) );
 		return;
 	
+	if _character.is_attack_just_pressed():
+		state_machine.transition_to( 'CharacterStateForwardTilt' );
+		return;
+	
 	super.process( delta );

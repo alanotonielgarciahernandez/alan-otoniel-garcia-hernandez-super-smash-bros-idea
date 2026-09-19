@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="MoveData" format=3 uid="uid://cr7dvwdhpmppv"]
+
+[ext_resource type="Script" uid="uid://bnndf60rtailf" path="res://data/moves/move_data.gd" id="1_4lg5u"]
+
+[resource]
+script = ExtResource("1_4lg5u")
+move_name = "forward_tilt"
+startup_frames = 8
+endlag_frames = 15
+damage = 10.0
+base_knockback = 50.0
+hitlag_frames = 6
+metadata/_custom_type_script = "uid://bnndf60rtailf"

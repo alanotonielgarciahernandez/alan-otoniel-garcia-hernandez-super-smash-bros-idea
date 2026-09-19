@@ -31,4 +31,8 @@ func process( delta: float ) -> void:
 		state_machine.transition_to( target );
 		return;
 	
+	if _character.is_attack_just_pressed():
+		state_machine.transition_to( 'CharacterStateForwardTilt' );
+		return;
+	
 	super.process( delta );

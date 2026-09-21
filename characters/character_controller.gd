@@ -66,6 +66,9 @@ const GROUND_FRICTION: float = 1800.0;
 ## Higher = stops faster
 const AIR_FRICTION: float = 200.0;
 
+## Multiplier so knockback magnitudes match jump / run scale.
+const KNOCKBACK_SCALE: float = 4.5;
+
 #endregion
 
 #region Character actions frame-data constants.
@@ -266,7 +269,9 @@ func apply_hit( move: MoveData, attacker_facing: float = 1.0 ) -> void:
 	
 	# Knockback magnitude: base + growth scaled by current percent.
 	# Simplified formula — good feel for early testing; can later match Melee weight/ratios more closely.
-	var kb: float = move.base_knockback + ( percent * move.knockback_growth * 0.01 );
+	var kb: float = (
+		move.base_knockback + ( percent * move.knockback_growth * 0.01 )
+		) * KNOCKBACK_SCALE;
 	
 	# Launch direction from angle (0° = forward, 90° = straight up).
 	var rad: float = deg_to_rad( move.angle_degrees );

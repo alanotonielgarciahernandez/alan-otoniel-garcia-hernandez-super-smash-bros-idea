@@ -20,6 +20,8 @@
 [ext_resource type="Script" uid="uid://bc0asnp8c3baa" path="res://state/character_states/character_state_hitstun.gd" id="18_e3kty"]
 [ext_resource type="Script" uid="uid://bt2o258mcpr33" path="res://state/character_states/character_state_forward_tilt.gd" id="19_4unn8"]
 [ext_resource type="Resource" uid="uid://cr7dvwdhpmppv" path="res://data/moves/forward_tilt.tres" id="20_5fe2j"]
+[ext_resource type="Script" uid="uid://cpmo7dac4ngdf" path="res://state/character_states/character_state_up_tilt.gd" id="21_md4ow"]
+[ext_resource type="Resource" uid="uid://bylms51ll0akr" path="res://data/moves/up_tilt.tres" id="22_mqba4"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_lgekj"]
 height = 40.0
@@ -284,6 +286,9 @@ height = 40.0
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_5fe2j"]
 height = 60.0
 
+[sub_resource type="CircleShape2D" id="CircleShape2D_i6j22"]
+radius = 30.0
+
 [node name="Character" type="CharacterBody2D" unique_id=607234549 node_paths=PackedStringArray("state_machine", "animator")]
 script = ExtResource("1_ke030")
 state_machine = NodePath("StateMachine")
@@ -313,6 +318,7 @@ shape = SubResource("CapsuleShape2D_g4v7s")
 position = Vector2(30, 0)
 collision_layer = 0
 collision_mask = 128
+monitorable = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hitboxes/Jab" unique_id=871394853]
 rotation = 1.5707964
@@ -320,14 +326,25 @@ shape = SubResource("CapsuleShape2D_yf5fn")
 disabled = true
 
 [node name="ForwardTilt" type="Area2D" parent="Hitboxes" unique_id=687838707]
-position = Vector2(30, 0)
+position = Vector2(40, 0)
 collision_layer = 0
 collision_mask = 128
+monitorable = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hitboxes/ForwardTilt" unique_id=1655168189]
-position = Vector2(10, 0)
 rotation = 1.5707964
 shape = SubResource("CapsuleShape2D_5fe2j")
+disabled = true
+
+[node name="UpTilt" type="Area2D" parent="Hitboxes" unique_id=172573186]
+position = Vector2(0, -20)
+collision_layer = 0
+collision_mask = 128
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitboxes/UpTilt" unique_id=1592866880]
+rotation = 1.5707964
+shape = SubResource("CircleShape2D_i6j22")
 disabled = true
 
 [node name="StateMachine" parent="." unique_id=2001641582 node_paths=PackedStringArray("initial_state") instance=ExtResource("1_54qew")]
@@ -369,3 +386,8 @@ hitbox = NodePath("../../Hitboxes/Jab")
 script = ExtResource("19_4unn8")
 move_data = ExtResource("20_5fe2j")
 hitbox = NodePath("../../Hitboxes/ForwardTilt")
+
+[node name="CharacterStateUpTilt" type="Node" parent="StateMachine" unique_id=2023054036 node_paths=PackedStringArray("hitbox")]
+script = ExtResource("21_md4ow")
+move_data = ExtResource("22_mqba4")
+hitbox = NodePath("../../Hitboxes/UpTilt")

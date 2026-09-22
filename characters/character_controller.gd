@@ -187,6 +187,10 @@ func is_attack_pressed() -> bool:
 func get_move_axis() -> float:
 	return _input_reader.get_move_axis();
 
+## Returns this character's vertical input axis, from its assigned device only.
+func get_vertical_axis() -> float:
+	return _input_reader.get_vertical_axis();
+
 ## Returns the grounded movement state to enter for the given horizontal
 ## input — used when starting fresh movement (from Idle or on landing).
 func get_ground_move_state( direction: float ) -> String:

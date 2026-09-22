@@ -30,7 +30,14 @@ func process( _delta: float ) -> void:
 		return;
 	
 	if _character.is_attack_just_pressed():
-		state_machine.transition_to( 'CharacterStateJab' );
+		if direction != 0.0:
+			state_machine.transition_to( 'CharacterStateForwardTilt' );
+		
+		elif _character.get_vertical_axis():
+			state_machine.transition_to( 'CharacterStateUpTilt' );
+		
+		else:
+			state_machine.transition_to( 'CharacterStateJab' );
 		return;
 	
 	if not _character.is_on_floor():

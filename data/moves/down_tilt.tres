@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="MoveData" format=3 uid="uid://dt76v7uhulsx1"]
+
+[ext_resource type="Script" uid="uid://bnndf60rtailf" path="res://data/moves/move_data.gd" id="1_y5qjr"]
+
+[resource]
+script = ExtResource("1_y5qjr")
+move_name = "down_tilt"
+startup_frames = 10
+active_frames = 1
+endlag_frames = 19
+damage = 10.0
+base_knockback = 50.0
+angle_degrees = 80.0
+metadata/_custom_type_script = "uid://bnndf60rtailf"

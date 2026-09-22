@@ -29,9 +29,12 @@ func process( _delta: float ) -> void:
 		var h := _character.get_move_axis();
 		var v := _character.get_vertical_axis();
 		
-		# Up has priority when stick is clearly up (Godot: up is negative Y).
+		# Up has priority when stick is clearly up.
 		if v < -0.5:
 			state_machine.transition_to( 'CharacterStateUpTilt' );
+		# Down has priority when stick is clearly down.
+		elif v > 0.5:
+			state_machine.transition_to( 'CharacterStateDownTilt' );
 		# Forward when horizontal is dominant.
 		elif absf( h ) > 0.5:
 			state_machine.transition_to( 'CharacterStateForwardTilt' );

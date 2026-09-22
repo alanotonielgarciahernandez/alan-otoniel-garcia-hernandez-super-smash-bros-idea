@@ -22,6 +22,10 @@
 [ext_resource type="Resource" uid="uid://cr7dvwdhpmppv" path="res://data/moves/forward_tilt.tres" id="20_5fe2j"]
 [ext_resource type="Script" uid="uid://cpmo7dac4ngdf" path="res://state/character_states/character_state_up_tilt.gd" id="21_md4ow"]
 [ext_resource type="Resource" uid="uid://bylms51ll0akr" path="res://data/moves/up_tilt.tres" id="22_mqba4"]
+[ext_resource type="Script" uid="uid://b8oxkv8ku4ctg" path="res://state/character_states/character_state_down_tilt.gd" id="23_hkrj1"]
+[ext_resource type="Script" uid="uid://bj6eeqqoe7d68" path="res://state/character_states/character_state_dash_attack.gd" id="24_3lgwp"]
+[ext_resource type="Resource" uid="uid://dt76v7uhulsx1" path="res://data/moves/down_tilt.tres" id="24_x8lwa"]
+[ext_resource type="Resource" uid="uid://dglwv46s0roum" path="res://data/moves/dash_attack.tres" id="26_uq2ax"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_lgekj"]
 height = 40.0
@@ -289,6 +293,12 @@ height = 60.0
 [sub_resource type="CircleShape2D" id="CircleShape2D_i6j22"]
 radius = 30.0
 
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_mqba4"]
+height = 60.0
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_bb4xn"]
+height = 60.0
+
 [node name="Character" type="CharacterBody2D" unique_id=607234549 node_paths=PackedStringArray("state_machine", "animator")]
 script = ExtResource("1_ke030")
 state_machine = NodePath("StateMachine")
@@ -347,6 +357,28 @@ rotation = 1.5707964
 shape = SubResource("CircleShape2D_i6j22")
 disabled = true
 
+[node name="DownTilt" type="Area2D" parent="Hitboxes" unique_id=688900874]
+position = Vector2(40, 10)
+collision_layer = 0
+collision_mask = 128
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitboxes/DownTilt" unique_id=1420891997]
+rotation = 1.5707964
+shape = SubResource("CapsuleShape2D_mqba4")
+disabled = true
+
+[node name="DashAttack" type="Area2D" parent="Hitboxes" unique_id=831473766]
+position = Vector2(40, 0)
+collision_layer = 0
+collision_mask = 128
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitboxes/DashAttack" unique_id=1839689819]
+rotation = 1.5707964
+shape = SubResource("CapsuleShape2D_bb4xn")
+disabled = true
+
 [node name="StateMachine" parent="." unique_id=2001641582 node_paths=PackedStringArray("initial_state") instance=ExtResource("1_54qew")]
 initial_state = NodePath("CharacterStateIdle")
 
@@ -391,3 +423,13 @@ hitbox = NodePath("../../Hitboxes/ForwardTilt")
 script = ExtResource("21_md4ow")
 move_data = ExtResource("22_mqba4")
 hitbox = NodePath("../../Hitboxes/UpTilt")
+
+[node name="CharacterStateDownTilt" type="Node" parent="StateMachine" unique_id=2048264551 node_paths=PackedStringArray("hitbox")]
+script = ExtResource("23_hkrj1")
+move_data = ExtResource("24_x8lwa")
+hitbox = NodePath("../../Hitboxes/DownTilt")
+
+[node name="CharacterStateDashAttack" type="Node" parent="StateMachine" unique_id=1301081243 node_paths=PackedStringArray("hitbox")]
+script = ExtResource("24_3lgwp")
+move_data = ExtResource("26_uq2ax")
+hitbox = NodePath("../../Hitboxes/DashAttack")

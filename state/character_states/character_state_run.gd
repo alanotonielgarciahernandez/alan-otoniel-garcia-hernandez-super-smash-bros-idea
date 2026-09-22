@@ -25,6 +25,10 @@ func process( delta: float ) -> void:
 	var direction := _character.get_move_axis();
 	var magnitude := absf( direction );
 	
+	if _character.is_attack_just_pressed():
+		state_machine.transition_to( 'CharacterStateDashAttack' );
+		return;
+	
 	# Stick eased below full tilt → drop to Jog (or Walk if almost neutral).
 	if magnitude < CharacterController.RUN_MAGNITUDE_THRESHOLD:
 		if magnitude < CharacterController.WALK_MAGNITUDE_THRESHOLD:

@@ -20,6 +20,10 @@ func process( delta: float ) -> void:
 	var direction := _character.get_move_axis();
 	var magnitude := absf( direction );
 	
+	if _character.is_attack_just_pressed():
+		state_machine.transition_to( 'CharacterStateForwardTilt' );
+		return;
+		
 	# Stick eased below walk threshold → Walk.
 	if magnitude < CharacterController.WALK_MAGNITUDE_THRESHOLD:
 		state_machine.transition_to( 'CharacterStateWalk' );
@@ -29,10 +33,6 @@ func process( delta: float ) -> void:
 	var target := _character.get_ground_move_state( direction );
 	if target == 'CharacterStateRun':
 		state_machine.transition_to( target );
-		return;
-	
-	if _character.is_attack_just_pressed():
-		state_machine.transition_to( 'CharacterStateForwardTilt' );
 		return;
 	
 	super.process( delta );

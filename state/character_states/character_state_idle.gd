@@ -21,23 +21,27 @@ func start() -> void:
 func process( _delta: float ) -> void:
 	var direction := _character.get_move_axis();
 	
-	if direction != 0.0:
-		state_machine.transition_to( _character.get_ground_move_state( direction ) );
-		return;
-	
 	if _character.is_jump_just_pressed():
 		state_machine.transition_to( 'CharacterStateJumpSquat' );
 		return;
 	
 	if _character.is_attack_just_pressed():
-		if direction != 0.0:
-			state_machine.transition_to( 'CharacterStateForwardTilt' );
+		var h := _character.get_move_axis();
+		var v := _character.get_vertical_axis();
 		
-		elif _character.get_vertical_axis():
+		# Up has priority when stick is clearly up (Godot: up is negative Y).
+		if v < -0.5:
 			state_machine.transition_to( 'CharacterStateUpTilt' );
-		
+		# Forward when horizontal is dominant.
+		elif absf( h ) > 0.5:
+			state_machine.transition_to( 'CharacterStateForwardTilt' );
+		# Neutral (and down until Down Tilt exists).
 		else:
 			state_machine.transition_to( 'CharacterStateJab' );
+		return;
+	
+	if direction != 0.0:
+		state_machine.transition_to( _character.get_ground_move_state( direction ) );
 		return;
 	
 	if not _character.is_on_floor():

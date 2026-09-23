@@ -16,8 +16,8 @@ func start() -> void:
 	# Any new jump cancels fast-fall.
 	_character.is_fast_falling = false;
 	
-	# Optional: play a jumpsquat / crouch animation if you have one.
-	# _character.animator.play( 'jump_squat' );
+	# Play the jump squat animation. 
+	_character.animator.play( 'jump_squat' );
 	
 	# Start the jumpsquat frame count.
 	jump_squat_frames = CharacterController.JUMP_SQUAT_FRAMES;

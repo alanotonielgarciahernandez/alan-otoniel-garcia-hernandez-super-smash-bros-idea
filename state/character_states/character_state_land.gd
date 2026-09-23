@@ -11,7 +11,7 @@ func start() -> void:
 	# Run the base class's start() first to cache the character reference.
 	super.start();
 	
-	# Play land animation.
+	# Play the land animation.
 	_character.animator.play( 'land' );
 	
 	# Recharge jumps.

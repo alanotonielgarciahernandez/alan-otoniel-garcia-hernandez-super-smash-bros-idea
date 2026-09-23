@@ -15,6 +15,7 @@ func start() -> void:
 	# Any new jump cancels fast-fall.
 	_character.is_fast_falling = false;
 	
+	# Play the jump animation.
 	_character.animator.play( 'jump' );
 	
 	# Only consume / set velocity when this is an aerial jump

@@ -38,7 +38,6 @@ func process( _delta: float ) -> void:
 		# Forward when horizontal is dominant.
 		elif absf( h ) > 0.5:
 			state_machine.transition_to( 'CharacterStateForwardTilt' );
-		# Neutral (and down until Down Tilt exists).
 		else:
 			state_machine.transition_to( 'CharacterStateJab' );
 		return;

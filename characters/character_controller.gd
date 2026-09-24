@@ -133,11 +133,16 @@ var hitlag_frames: int = 0;
 
 #endregion
 
+## Percent label above the character.
+@export var percent_label: Label;
+
 
 func _ready() -> void:
 	@warning_ignore( 'incompatible_ternary' )
 	# Assign the input reader matching this character's device, once.
 	_input_reader = KeyboardInputReader.new() if device_id == -1 else JoypadInputReader.new( device_id );
+	
+	_update_percent_label();
 
 func _physics_process( _delta: float ) -> void:
 	# Hitlag freeze — skip everything while frozen.
@@ -271,6 +276,8 @@ func apply_hit( move: MoveData, attacker_facing: float = 1.0 ) -> void:
 	# Add damage percent.
 	percent += move.damage;
 	
+	_update_percent_label();
+	
 	# Knockback magnitude: base + growth scaled by current percent.
 	# Simplified formula — good feel for early testing; can later match Melee weight/ratios more closely.
 	var kb: float = (
@@ -304,3 +311,10 @@ func apply_hit( move: MoveData, attacker_facing: float = 1.0 ) -> void:
 	# TODO next:
 	# - Apply hitlag freeze (move.hitlag_frames)
 	# - Spawn hit spark / SFX
+
+## Refreshes the on-character percent text.
+func _update_percent_label() -> void:
+	if percent_label == null:
+		return;
+	
+	percent_label.text = str( percent, '%' );

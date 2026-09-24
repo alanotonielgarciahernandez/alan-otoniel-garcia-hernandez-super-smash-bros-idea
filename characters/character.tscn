@@ -311,10 +311,11 @@ height = 60.0
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_bb4xn"]
 height = 60.0
 
-[node name="Character" type="CharacterBody2D" unique_id=607234549 node_paths=PackedStringArray("state_machine", "animator")]
+[node name="Character" type="CharacterBody2D" unique_id=607234549 node_paths=PackedStringArray("state_machine", "animator", "percent_label")]
 script = ExtResource("1_ke030")
 state_machine = NodePath("StateMachine")
 animator = NodePath("AnimatedSprite2D")
+percent_label = NodePath("Debug/Percent")
 metadata/launch_direction = Vector2(0, 0)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=138225110]
@@ -444,3 +445,15 @@ hitbox = NodePath("../../Hitboxes/DownTilt")
 script = ExtResource("24_3lgwp")
 move_data = ExtResource("26_uq2ax")
 hitbox = NodePath("../../Hitboxes/DashAttack")
+
+[node name="Debug" type="Node2D" parent="." unique_id=280802629]
+
+[node name="Percent" type="Label" parent="Debug" unique_id=1620316685]
+offset_left = -16.0
+offset_top = -36.0
+offset_right = 16.0
+offset_bottom = -20.0
+theme_override_font_sizes/font_size = 11
+text = "0.00%"
+horizontal_alignment = 1
+vertical_alignment = 1

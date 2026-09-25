@@ -42,11 +42,8 @@ func physics_process( delta: float ) -> void:
 	# Get horizontal input axis from the character's assigned device.
 	var direction := _character.get_move_axis();
 	
-	# Flip sprite to face movement direction.
-	if direction > 0.0:
-		_character.animator.flip_h = false;
-	elif direction < 0.0:
-		_character.animator.flip_h = true;
+	# Update character facing.
+	_character.set_facing( direction );
 	
 	# Decide target velocity for this frame.
 	var target_velocity_x: float = direction * _speed;

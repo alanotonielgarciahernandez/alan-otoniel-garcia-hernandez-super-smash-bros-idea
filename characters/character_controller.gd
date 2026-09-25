@@ -131,6 +131,10 @@ var hitstun_frames: int = 0;
 ## Frames of hitlag remaining. While > 0 the character is frozen.
 var hitlag_frames: int = 0;
 
+## Horizontal facing. +1 = right, -1 = left.
+## Source of truth for hitboxes, launch direction, and sprite flip.
+var facing: float = 1.0;
+
 #endregion
 
 ## Percent label above the character.
@@ -264,6 +268,19 @@ func apply_gravity( delta: float ) -> void:
 	var max_fall: float = FAST_FALL_SPEED if is_fast_falling else TERMINAL_VELOCITY;
 	velocity.y = minf( max_fall, velocity.y + get_gravity().y * delta );
 
+## Sets facing from a horizontal input or explicit sign.
+## Also syncs the animator so the sprite matches.
+func set_facing( direction: float ) -> void:
+	# Ignore neutral — keep current facing.
+	if direction == 0.0:
+		return;
+	
+	# Store sign only (+1 or -1).
+	facing = signf( direction );
+	
+	# flip_h true = looking left.
+	if animator:
+		animator.flip_h = facing < 0.0;
 
 ## Applies a hit from a MoveData resource.
 ## Adds percent, calculates simplified Smash-style knockback, and launches the character.
@@ -305,11 +322,10 @@ func apply_hit( move: MoveData, attacker_facing: float = 1.0 ) -> void:
 	if state_machine:
 		state_machine.transition_to( 'CharacterStateHitstun' );
 	
-	# Temporary debug feedback — remove once you have UI / hit VFX.
+	# Temporary debug feedback.
 	print( 'Hit! percent = ', percent, '  kb = ', kb, '  angle = ', move.angle_degrees );
 	
 	# TODO next:
-	# - Apply hitlag freeze (move.hitlag_frames)
 	# - Spawn hit spark / SFX
 
 ## Refreshes the on-character percent text.

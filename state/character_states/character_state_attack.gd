@@ -125,11 +125,8 @@ func _update_hitbox_facing() -> void:
 	if hitbox == null:
 		return;
 	
-	# Positive X = facing right, negative = facing left.
-	var facing: float = -1.0 if _character.animator.flip_h else 1.0;
-	
-	# Keep the absolute offset and apply the sign of facing.
-	hitbox.position.x = absf( hitbox.position.x ) * facing;
+	# Keep the absolute offset and apply facing sign.
+	hitbox.position.x = absf( hitbox.position.x ) * _character.facing;
 
 
 ## Hits any Hurtbox already overlapping when the hitbox turns on.
@@ -155,11 +152,8 @@ func _on_hitbox_area_entered( area: Area2D ) -> void:
 	if victim == null or victim == _character:
 		return;
 	
-	# Determine launch direction from our current facing.
-	var facing: float = -1.0 if _character.animator.flip_h else 1.0;
-	
 	# Apply the hit (damage + knockback + victim hitlag + hitstun).
-	victim.apply_hit( move_data, facing );
+	victim.apply_hit( move_data, _character.facing );
 	
 	# Freeze the attacker for the same hitlag window.
 	_character.hitlag_frames = move_data.hitlag_frames;

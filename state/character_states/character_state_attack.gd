@@ -120,7 +120,6 @@ func _set_hitbox_active( active: bool ) -> void:
 
 
 ## Flips the hitbox X position to match the character's current facing.
-## Uses animator.flip_h for now; replace with a real facing variable later.
 func _update_hitbox_facing() -> void:
 	if hitbox == null:
 		return;

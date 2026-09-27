@@ -32,4 +32,5 @@ extends Resource;
 @export var hitlag_frames: int = 4;
 
 ## Animation to play on the character when this move starts.
-@export var animation_name: String = 'idle';
+## Empty by default so a missing override does not silently play idle.
+@export var animation_name: String = '';

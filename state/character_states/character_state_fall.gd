@@ -15,6 +15,11 @@ func start() -> void:
 	_character.animator.play( 'fall' );
 
 func physics_process( delta: float ) -> void:
+	# Neutral aerial (stick-based aerials later).
+	if _character.is_attack_just_pressed():
+		state_machine.transition_to( 'CharacterStateNeutralAerial' );
+		return;
+	
 	super.physics_process( delta );
 	
 	# Fast-fall: only possible while already falling, press down to activate.

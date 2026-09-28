@@ -29,6 +29,11 @@ func start() -> void:
 		_character.velocity.y = CharacterController.JUMP_VELOCITY;
 
 func physics_process( delta: float ) -> void:
+	# Neutral aerial (stick-based aerials later).
+	if _character.is_attack_just_pressed():
+		state_machine.transition_to( 'CharacterStateNeutralAerial' );
+		return;
+	
 	super.physics_process( delta );
 	
 	# Inside Jump.physics_process, after the hold/cut logic or near the top

@@ -22,6 +22,8 @@
 [ext_resource type="Script" uid="uid://bj6eeqqoe7d68" path="res://state/character_states/character_state_dash_attack.gd" id="24_3lgwp"]
 [ext_resource type="Resource" uid="uid://dt76v7uhulsx1" path="res://data/moves/down_tilt.tres" id="24_x8lwa"]
 [ext_resource type="Resource" uid="uid://dglwv46s0roum" path="res://data/moves/dash_attack.tres" id="26_uq2ax"]
+[ext_resource type="Script" path="res://state/character_states/character_state_neutral_aerial.gd" id="27_nair"]
+[ext_resource type="Resource" path="res://data/moves/neutral_aerial.tres" id="28_nair"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_lgekj"]
 height = 40.0
@@ -311,6 +313,9 @@ height = 60.0
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_bb4xn"]
 height = 60.0
 
+[sub_resource type="CircleShape2D" id="CircleShape2D_nair"]
+radius = 28.0
+
 [node name="Character" type="CharacterBody2D" unique_id=607234549 node_paths=PackedStringArray("state_machine", "animator", "percent_label")]
 script = ExtResource("1_ke030")
 state_machine = NodePath("StateMachine")
@@ -391,6 +396,16 @@ rotation = 1.5707964
 shape = SubResource("CapsuleShape2D_bb4xn")
 disabled = true
 
+[node name="NeutralAerial" type="Area2D" parent="Hitboxes"]
+position = Vector2(8, 0)
+collision_layer = 0
+collision_mask = 128
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitboxes/NeutralAerial"]
+shape = SubResource("CircleShape2D_nair")
+disabled = true
+
 [node name="StateMachine" parent="." unique_id=2001641582 node_paths=PackedStringArray("initial_state") instance=ExtResource("1_54qew")]
 initial_state = NodePath("CharacterStateIdle")
 
@@ -445,6 +460,11 @@ hitbox = NodePath("../../Hitboxes/DownTilt")
 script = ExtResource("24_3lgwp")
 move_data = ExtResource("26_uq2ax")
 hitbox = NodePath("../../Hitboxes/DashAttack")
+
+[node name="CharacterStateNeutralAerial" type="Node" parent="StateMachine" node_paths=PackedStringArray("hitbox")]
+script = ExtResource("27_nair")
+move_data = ExtResource("28_nair")
+hitbox = NodePath("../../Hitboxes/NeutralAerial")
 
 [node name="Debug" type="Node2D" parent="." unique_id=280802629]
 

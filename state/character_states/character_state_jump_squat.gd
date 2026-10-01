@@ -41,6 +41,10 @@ func physics_process( delta: float ) -> void:
 	_character.apply_gravity( delta );
 	_character.move_and_slide();
 	
+	# Buffer aerial so it can come out on the first air frame (Smash-style).
+	if _character.is_attack_just_pressed():
+		_character.buffer_input( 'attack' );
+	
 	# Jumpsquat finished — decide hop type and leave the ground.
 	if jump_squat_frames <= 0:
 		_finish_jumpsquat();
@@ -57,5 +61,10 @@ func _finish_jumpsquat() -> void:
 	else:
 		_character.velocity.y = CharacterController.SHORT_HOP_VELOCITY;
 	
-	# Go to the rising Jump state.
+	# Buffered attack during squat → aerial immediately.
+	if _character.consume_buffered_input( 'attack' ):
+		state_machine.transition_to( 'CharacterStateNeutralAerial' );
+		return;
+	
+	# No buffered attack → normal rising jump.
 	state_machine.transition_to( 'CharacterStateJump' );

@@ -21,8 +21,12 @@
 [ext_resource type="Script" uid="uid://b8oxkv8ku4ctg" path="res://state/character_states/character_state_down_tilt.gd" id="23_hkrj1"]
 [ext_resource type="Script" uid="uid://bj6eeqqoe7d68" path="res://state/character_states/character_state_dash_attack.gd" id="24_3lgwp"]
 [ext_resource type="Resource" uid="uid://dt76v7uhulsx1" path="res://data/moves/down_tilt.tres" id="24_x8lwa"]
+[ext_resource type="Script" uid="uid://thbipvp2mgo8" path="res://state/character_states/character_state_forward_aerial.gd" id="25_x8lwa"]
+[ext_resource type="Resource" uid="uid://djdy1bolutj3x" path="res://data/moves/forward_aerial.tres" id="26_aiskv"]
+[ext_resource type="Script" uid="uid://c3s0rxoiqjtj1" path="res://state/character_states/character_state_backward_aerial.gd" id="26_bi0q0"]
 [ext_resource type="Resource" uid="uid://dglwv46s0roum" path="res://data/moves/dash_attack.tres" id="26_uq2ax"]
-[ext_resource type="Script" path="res://state/character_states/character_state_neutral_aerial.gd" id="27_nair"]
+[ext_resource type="Script" uid="uid://bmbfiwgaxo0qw" path="res://state/character_states/character_state_neutral_aerial.gd" id="27_nair"]
+[ext_resource type="Resource" uid="uid://bly4jfm3erh1" path="res://data/moves/backward_aerial.tres" id="28_g5jic"]
 [ext_resource type="Resource" path="res://data/moves/neutral_aerial.tres" id="28_nair"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_lgekj"]
@@ -316,10 +320,17 @@ height = 60.0
 [sub_resource type="CircleShape2D" id="CircleShape2D_nair"]
 radius = 28.0
 
-[node name="Character" type="CharacterBody2D" unique_id=607234549 node_paths=PackedStringArray("state_machine", "animator", "percent_label")]
+[sub_resource type="CircleShape2D" id="CircleShape2D_x8lwa"]
+radius = 20.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_uq2ax"]
+radius = 20.0
+
+[node name="Character" type="CharacterBody2D" unique_id=607234549 node_paths=PackedStringArray("state_machine", "animator", "hitbox_container", "percent_label")]
 script = ExtResource("1_ke030")
 state_machine = NodePath("StateMachine")
 animator = NodePath("AnimatedSprite2D")
+hitbox_container = NodePath("Hitboxes")
 percent_label = NodePath("Debug/Percent")
 metadata/launch_direction = Vector2(0, 0)
 
@@ -396,14 +407,35 @@ rotation = 1.5707964
 shape = SubResource("CapsuleShape2D_bb4xn")
 disabled = true
 
-[node name="NeutralAerial" type="Area2D" parent="Hitboxes"]
+[node name="NeutralAerial" type="Area2D" parent="Hitboxes" unique_id=523511660]
 position = Vector2(8, 0)
 collision_layer = 0
 collision_mask = 128
 monitorable = false
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitboxes/NeutralAerial"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitboxes/NeutralAerial" unique_id=934095984]
 shape = SubResource("CircleShape2D_nair")
+disabled = true
+
+[node name="ForwardAerial" type="Area2D" parent="Hitboxes" unique_id=1622025550]
+position = Vector2(8, 0)
+collision_layer = 0
+collision_mask = 128
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitboxes/ForwardAerial" unique_id=327964980]
+position = Vector2(11, 7)
+shape = SubResource("CircleShape2D_x8lwa")
+disabled = true
+
+[node name="BackwardAerial" type="Area2D" parent="Hitboxes" unique_id=1792302245]
+position = Vector2(-11, 0)
+collision_layer = 0
+collision_mask = 128
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitboxes/BackwardAerial" unique_id=1693257593]
+shape = SubResource("CircleShape2D_uq2ax")
 disabled = true
 
 [node name="StateMachine" parent="." unique_id=2001641582 node_paths=PackedStringArray("initial_state") instance=ExtResource("1_54qew")]
@@ -461,10 +493,20 @@ script = ExtResource("24_3lgwp")
 move_data = ExtResource("26_uq2ax")
 hitbox = NodePath("../../Hitboxes/DashAttack")
 
-[node name="CharacterStateNeutralAerial" type="Node" parent="StateMachine" node_paths=PackedStringArray("hitbox")]
+[node name="CharacterStateNeutralAerial" type="Node" parent="StateMachine" unique_id=1886526493 node_paths=PackedStringArray("hitbox")]
 script = ExtResource("27_nair")
 move_data = ExtResource("28_nair")
 hitbox = NodePath("../../Hitboxes/NeutralAerial")
+
+[node name="CharacterStateForwardAerial" type="Node" parent="StateMachine" unique_id=512401126 node_paths=PackedStringArray("hitbox")]
+script = ExtResource("25_x8lwa")
+move_data = ExtResource("26_aiskv")
+hitbox = NodePath("../../Hitboxes/ForwardAerial")
+
+[node name="CharacterStateBackwardAerial" type="Node" parent="StateMachine" unique_id=193898142 node_paths=PackedStringArray("hitbox")]
+script = ExtResource("26_bi0q0")
+move_data = ExtResource("28_g5jic")
+hitbox = NodePath("../../Hitboxes/BackwardAerial")
 
 [node name="Debug" type="Node2D" parent="." unique_id=280802629]
 

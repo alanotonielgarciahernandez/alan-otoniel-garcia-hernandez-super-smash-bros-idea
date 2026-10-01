@@ -29,9 +29,17 @@ func start() -> void:
 		_character.velocity.y = CharacterController.JUMP_VELOCITY;
 
 func physics_process( delta: float ) -> void:
-	# Neutral aerial (stick-based aerials later).
+	# Aerial attack.
 	if _character.is_attack_just_pressed():
-		state_machine.transition_to( 'CharacterStateNeutralAerial' );
+		var direction: float = _character.get_move_axis();
+		var facing: float = _character.facing;
+		
+		if signf( direction ) != facing and absf( direction ) > 0.5:
+			state_machine.transition_to( 'CharacterStateBackwardAerial' );
+		elif signf( direction ) == facing and absf( direction ) > 0.5:
+			state_machine.transition_to( 'CharacterStateForwardAerial' );
+		else:
+			state_machine.transition_to( 'CharacterStateNeutralAerial' );
 		return;
 	
 	super.physics_process( delta );

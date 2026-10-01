@@ -96,6 +96,9 @@ const MAX_JUMPS: int = 2;
 ## Character Animator object reference.
 @export var animator: AnimatedSprite2D;
 
+## Character Hitbox container object reference.
+@export var hitbox_container: Node2D;
+
 ## Device controlling this character. -1 = keyboard. 0+ = joypad index,
 ## matching Input.get_connected_joypads().
 @export var device_id: int = -1;
@@ -145,6 +148,9 @@ func _ready() -> void:
 	@warning_ignore( 'incompatible_ternary' )
 	# Assign the input reader matching this character's device, once.
 	_input_reader = KeyboardInputReader.new() if device_id == -1 else JoypadInputReader.new( device_id );
+	
+	if hitbox_container:
+		hitbox_container.scale.x = facing;
 	
 	_update_percent_label();
 
@@ -281,6 +287,9 @@ func set_facing( direction: float ) -> void:
 	# flip_h true = looking left.
 	if animator:
 		animator.flip_h = facing < 0.0;
+	
+	if hitbox_container:
+		hitbox_container.scale.x = facing;
 
 ## Applies a hit from a MoveData resource.
 ## Adds percent, calculates simplified Smash-style knockback, and launches the character.

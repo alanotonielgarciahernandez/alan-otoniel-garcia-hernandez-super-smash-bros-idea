@@ -45,20 +45,14 @@ func start() -> void:
 	_phase = Phase.STARTUP;
 	_frames_left = move_data.startup_frames;
 	_set_hitbox_active( false );
-	
-	# Flip the hitbox to the character's current facing.
-	_update_hitbox_facing();
-
 
 func end() -> void:
 	# Always turn the hitbox off when leaving this state.
 	_set_hitbox_active( false );
 
-
 func process( _delta: float ) -> void:
 	# Optional: allow jump-cancel or other cancels later.
 	pass;
-
 
 func physics_process( delta: float ) -> void:
 	# Keep grounded friction while attacking so residual momentum dies naturally.
@@ -118,16 +112,6 @@ func _set_hitbox_active( active: bool ) -> void:
 	# Also toggle monitoring so the area stops reporting when inactive.
 	hitbox.monitoring = active;
 
-
-## Flips the hitbox X position to match the character's current facing.
-func _update_hitbox_facing() -> void:
-	if hitbox == null:
-		return;
-	
-	# Keep the absolute offset and apply facing sign.
-	hitbox.position.x = absf( hitbox.position.x ) * _character.facing;
-
-
 ## Hits any Hurtbox already overlapping when the hitbox turns on.
 ## area_entered only fires on newly entering areas; this covers the rest.
 func _hit_current_overlaps() -> void:
@@ -136,7 +120,6 @@ func _hit_current_overlaps() -> void:
 	
 	for area in hitbox.get_overlapping_areas():
 		_on_hitbox_area_entered( area );
-
 
 ## Called when the attack hitbox overlaps another Area2D.
 func _on_hitbox_area_entered( area: Area2D ) -> void:

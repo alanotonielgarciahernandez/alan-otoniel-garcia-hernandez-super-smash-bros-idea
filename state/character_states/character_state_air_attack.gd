@@ -46,20 +46,14 @@ func start() -> void:
 	_phase = Phase.STARTUP;
 	_frames_left = move_data.startup_frames;
 	_set_hitbox_active( false );
-	
-	# Position hitbox from locked air facing (no set_facing in air).
-	_update_hitbox_facing();
-
 
 func end() -> void:
 	# Always turn the hitbox off when leaving this state.
 	_set_hitbox_active( false );
 
-
 func process( _delta: float ) -> void:
 	# Optional: aerial cancels later.
 	pass;
-
 
 func physics_process( delta: float ) -> void:
 	# Horizontal air drift (same model as CharacterAirState).
@@ -129,16 +123,6 @@ func _set_hitbox_active( active: bool ) -> void:
 	# Also toggle monitoring so the area stops reporting when inactive.
 	hitbox.monitoring = active;
 
-
-## Flips the hitbox X position to match the character's locked facing.
-func _update_hitbox_facing() -> void:
-	if hitbox == null:
-		return;
-	
-	# Keep the absolute offset and apply facing sign.
-	hitbox.position.x = absf( hitbox.position.x ) * _character.facing;
-
-
 ## Hits any Hurtbox already overlapping when the hitbox turns on.
 func _hit_current_overlaps() -> void:
 	if hitbox == null:
@@ -146,7 +130,6 @@ func _hit_current_overlaps() -> void:
 	
 	for area in hitbox.get_overlapping_areas():
 		_on_hitbox_area_entered( area );
-
 
 ## Called when the attack hitbox overlaps another Area2D.
 func _on_hitbox_area_entered( area: Area2D ) -> void:

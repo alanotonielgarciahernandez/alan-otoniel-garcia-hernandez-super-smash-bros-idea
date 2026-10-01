@@ -5,8 +5,10 @@
 [resource]
 script = ExtResource("1_nair")
 move_name = "back_aerial"
-startup_frames = 6
-endlag_frames = 12
-damage = 8.0
-base_knockback = 30.0
-hitlag_frames = 5
+startup_frames = 9
+endlag_frames = 20
+damage = 13.0
+base_knockback = 40.0
+knockback_growth = 60.0
+knockback_direction = -1.0
+hitlag_frames = 7

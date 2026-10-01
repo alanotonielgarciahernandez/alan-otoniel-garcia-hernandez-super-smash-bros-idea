@@ -31,15 +31,7 @@ func start() -> void:
 func physics_process( delta: float ) -> void:
 	# Aerial attack.
 	if _character.is_attack_just_pressed():
-		var direction: float = _character.get_move_axis();
-		var facing: float = _character.facing;
-		
-		if signf( direction ) != facing and absf( direction ) > 0.5:
-			state_machine.transition_to( 'CharacterStateBackwardAerial' );
-		elif signf( direction ) == facing and absf( direction ) > 0.5:
-			state_machine.transition_to( 'CharacterStateForwardAerial' );
-		else:
-			state_machine.transition_to( 'CharacterStateNeutralAerial' );
+		state_machine.transition_to( _character.get_aerial_attack_state() );
 		return;
 	
 	super.physics_process( delta );

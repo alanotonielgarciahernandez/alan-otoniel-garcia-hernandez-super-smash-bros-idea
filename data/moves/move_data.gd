@@ -25,6 +25,9 @@ extends Resource;
 ## Knockback growth (scales with target percent).
 @export var knockback_growth: float = 40.0;
 
+## Multiplies attacker facing for launch direction.
+@export var knockback_direction: float = 1.0;
+
 ## Launch angle in degrees. 0 = forward, 90 = straight up.
 @export var angle_degrees: float = 45.0;
 

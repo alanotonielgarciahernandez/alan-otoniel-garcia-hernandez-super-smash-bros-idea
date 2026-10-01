@@ -21,6 +21,9 @@ func start() -> void:
 	
 	# Start the jumpsquat frame count.
 	jump_squat_frames = CharacterController.JUMP_SQUAT_FRAMES;
+	
+	# Ignore attack buffered before this squat started.
+	_character.clear_buffered_input( 'attack' );
 
 func process( _delta: float ) -> void:
 	# Safety: if we somehow leave the floor during squat, go to Fall.
@@ -63,15 +66,7 @@ func _finish_jumpsquat() -> void:
 	
 	# Buffered attack during squat → aerial immediately.
 	if _character.consume_buffered_input( 'attack' ):
-		var direction: float = _character.get_move_axis();
-		var facing: float = _character.facing;
-		
-		if signf( direction ) != facing and absf( direction ) > 0.5:
-			state_machine.transition_to( 'CharacterStateBackwardAerial' );
-		elif signf( direction ) == facing and absf( direction ) > 0.5:
-			state_machine.transition_to( 'CharacterStateForwardAerial' );
-		else:
-			state_machine.transition_to( 'CharacterStateNeutralAerial' );
+		state_machine.transition_to( _character.get_aerial_attack_state() );
 		return;
 	
 	# No buffered attack → normal rising jump.

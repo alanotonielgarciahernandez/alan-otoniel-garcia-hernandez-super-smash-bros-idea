@@ -291,6 +291,14 @@ func set_facing( direction: float ) -> void:
 	if hitbox_container:
 		hitbox_container.scale.x = facing;
 
+func get_aerial_attack_state() -> String:
+	var direction := get_move_axis();
+	if absf( direction ) > 0.5:
+		if signf( direction ) == facing:
+			return 'CharacterStateForwardAerial';
+		return 'CharacterStateBackwardAerial';
+	return 'CharacterStateNeutralAerial';
+
 ## Applies a hit from a MoveData resource.
 ## Adds percent, calculates simplified Smash-style knockback, and launches the character.
 ## attacker_facing: +1 = right, -1 = left.
@@ -312,7 +320,8 @@ func apply_hit( move: MoveData, attacker_facing: float = 1.0 ) -> void:
 	
 	# Launch direction from angle (0° = forward, 90° = straight up).
 	var rad: float = deg_to_rad( move.angle_degrees );
-	var dir := Vector2( cos( rad ) * attacker_facing, -sin( rad ) );
+	var launch_facing: float = attacker_facing * move.knockback_direction;
+	var dir := Vector2( cos( rad ) * launch_facing, -sin( rad ) );
 	
 	# Apply launch velocity (overwrite current velocity — classic early fighter behaviour).
 	velocity = dir * kb;

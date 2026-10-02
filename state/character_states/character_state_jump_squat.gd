@@ -3,7 +3,7 @@
 #
 # Lasts a few frames while still on the floor.
 # At the end it chooses short hop or full hop based on whether
-# the jump button is still held — true Smash behaviour.
+# the jump button is still held.
 
 extends CharacterState;
 
@@ -44,7 +44,7 @@ func physics_process( delta: float ) -> void:
 	_character.apply_gravity( delta );
 	_character.move_and_slide();
 	
-	# Buffer aerial so it can come out on the first air frame (Smash-style).
+	# Buffer aerial so it can come out on the first air frame.
 	if _character.is_attack_just_pressed():
 		_character.buffer_input( 'attack' );
 	

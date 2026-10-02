@@ -21,13 +21,17 @@
 [ext_resource type="Script" uid="uid://b8oxkv8ku4ctg" path="res://state/character_states/character_state_down_tilt.gd" id="23_hkrj1"]
 [ext_resource type="Script" uid="uid://bj6eeqqoe7d68" path="res://state/character_states/character_state_dash_attack.gd" id="24_3lgwp"]
 [ext_resource type="Resource" uid="uid://dt76v7uhulsx1" path="res://data/moves/down_tilt.tres" id="24_x8lwa"]
+[ext_resource type="Script" uid="uid://ce2ng0ktklj3i" path="res://state/character_states/character_state_up_aerial.gd" id="25_g5jic"]
 [ext_resource type="Script" uid="uid://thbipvp2mgo8" path="res://state/character_states/character_state_forward_aerial.gd" id="25_x8lwa"]
 [ext_resource type="Resource" uid="uid://djdy1bolutj3x" path="res://data/moves/forward_aerial.tres" id="26_aiskv"]
 [ext_resource type="Script" uid="uid://c3s0rxoiqjtj1" path="res://state/character_states/character_state_backward_aerial.gd" id="26_bi0q0"]
+[ext_resource type="Resource" uid="uid://dy1q01uahng6c" path="res://data/moves/up_aerial.tres" id="26_j06h3"]
+[ext_resource type="Script" uid="uid://bh66hhym6k0mc" path="res://state/character_states/character_state_down_aerial.gd" id="26_n1o0q"]
 [ext_resource type="Resource" uid="uid://dglwv46s0roum" path="res://data/moves/dash_attack.tres" id="26_uq2ax"]
 [ext_resource type="Script" uid="uid://bmbfiwgaxo0qw" path="res://state/character_states/character_state_neutral_aerial.gd" id="27_nair"]
 [ext_resource type="Resource" uid="uid://bly4jfm3erh1" path="res://data/moves/backward_aerial.tres" id="28_g5jic"]
 [ext_resource type="Resource" path="res://data/moves/neutral_aerial.tres" id="28_nair"]
+[ext_resource type="Resource" uid="uid://e3s34bx86o1p" path="res://data/moves/down_aerial.tres" id="28_u7xjn"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_lgekj"]
 height = 40.0
@@ -417,6 +421,26 @@ monitorable = false
 shape = SubResource("CircleShape2D_nair")
 disabled = true
 
+[node name="UpAerial" type="Area2D" parent="Hitboxes" unique_id=246837258]
+position = Vector2(0, -39)
+collision_layer = 0
+collision_mask = 128
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitboxes/UpAerial" unique_id=1327115578]
+shape = SubResource("CircleShape2D_nair")
+disabled = true
+
+[node name="DownAerial" type="Area2D" parent="Hitboxes" unique_id=824456818]
+position = Vector2(0, 28)
+collision_layer = 0
+collision_mask = 128
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitboxes/DownAerial" unique_id=889776304]
+shape = SubResource("CircleShape2D_nair")
+disabled = true
+
 [node name="ForwardAerial" type="Area2D" parent="Hitboxes" unique_id=1622025550]
 position = Vector2(8, 0)
 collision_layer = 0
@@ -498,15 +522,25 @@ script = ExtResource("27_nair")
 move_data = ExtResource("28_nair")
 hitbox = NodePath("../../Hitboxes/NeutralAerial")
 
-[node name="CharacterStateForwardAerial" type="Node" parent="StateMachine" unique_id=512401126 node_paths=PackedStringArray("hitbox")]
-script = ExtResource("25_x8lwa")
-move_data = ExtResource("26_aiskv")
-hitbox = NodePath("../../Hitboxes/ForwardAerial")
+[node name="CharacterStateUpAerial" type="Node" parent="StateMachine" unique_id=236835621 node_paths=PackedStringArray("hitbox")]
+script = ExtResource("25_g5jic")
+move_data = ExtResource("26_j06h3")
+hitbox = NodePath("../../Hitboxes/UpAerial")
+
+[node name="CharacterStateDownAerial" type="Node" parent="StateMachine" unique_id=1845261937 node_paths=PackedStringArray("hitbox")]
+script = ExtResource("26_n1o0q")
+move_data = ExtResource("28_u7xjn")
+hitbox = NodePath("../../Hitboxes/DownAerial")
 
 [node name="CharacterStateBackwardAerial" type="Node" parent="StateMachine" unique_id=193898142 node_paths=PackedStringArray("hitbox")]
 script = ExtResource("26_bi0q0")
 move_data = ExtResource("28_g5jic")
 hitbox = NodePath("../../Hitboxes/BackwardAerial")
+
+[node name="CharacterStateForwardAerial" type="Node" parent="StateMachine" unique_id=512401126 node_paths=PackedStringArray("hitbox")]
+script = ExtResource("25_x8lwa")
+move_data = ExtResource("26_aiskv")
+hitbox = NodePath("../../Hitboxes/ForwardAerial")
 
 [node name="Debug" type="Node2D" parent="." unique_id=280802629]
 

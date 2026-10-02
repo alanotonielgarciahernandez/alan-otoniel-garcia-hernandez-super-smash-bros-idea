@@ -3,8 +3,8 @@
 #
 # Startup → enable hitbox → active → disable hitbox → endlag → Fall.
 # Timing is counted in integer frames (design target 60 FPS).
-# Air drift + gravity; landing cancels into Land (Smash-style auto-cancel).
-# Facing stays locked in the air (Ultimate-style).
+# Air drift + gravity; landing cancels into Land.
+# Facing stays locked in the air.
 
 class_name CharacterStateAirAttack;
 extends CharacterState;
@@ -79,7 +79,7 @@ func physics_process( delta: float ) -> void:
 	# Move and resolve collisions.
 	_character.move_and_slide();
 	
-	# Land during aerial → cancel into Land (Smash auto-cancel style).
+	# Land during aerial → cancel into Land.
 	if _character.is_on_floor():
 		state_machine.transition_to( 'CharacterStateLand' );
 		return;

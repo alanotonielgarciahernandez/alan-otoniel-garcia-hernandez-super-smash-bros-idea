@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="MoveData" format=3 uid="uid://e3s34bx86o1p"]
+
+[ext_resource type="Script" uid="uid://bnndf60rtailf" path="res://data/moves/move_data.gd" id="1_036dg"]
+
+[resource]
+script = ExtResource("1_036dg")
+move_name = "down_aerial"
+startup_frames = 16
+active_frames = 1
+endlag_frames = 20
+damage = 13.0
+base_knockback = 40.0
+knockback_growth = 60.0
+angle_degrees = 180.0
+hitlag_frames = 7

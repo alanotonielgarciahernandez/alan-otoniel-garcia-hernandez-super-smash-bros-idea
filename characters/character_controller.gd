@@ -292,15 +292,21 @@ func set_facing( direction: float ) -> void:
 		hitbox_container.scale.x = facing;
 
 func get_aerial_attack_state() -> String:
-	var direction := get_move_axis();
-	if absf( direction ) > 0.5:
-		if signf( direction ) == facing:
+	var h_direction := get_move_axis();
+	var v_direction := get_vertical_axis();
+	
+	if v_direction < -0.5:
+		return 'CharacterStateUpAerial';
+	elif v_direction > 0.5:
+		return 'CharacterStateDownAerial';
+	elif absf( h_direction ) > 0.5:
+		if signf( h_direction ) == facing:
 			return 'CharacterStateForwardAerial';
 		return 'CharacterStateBackwardAerial';
 	return 'CharacterStateNeutralAerial';
 
 ## Applies a hit from a MoveData resource.
-## Adds percent, calculates simplified Smash-style knockback, and launches the character.
+## Adds percent, calculates simplified knockback, and launches the character.
 ## attacker_facing: +1 = right, -1 = left.
 func apply_hit( move: MoveData, attacker_facing: float = 1.0 ) -> void:
 	# Safety.
@@ -313,7 +319,6 @@ func apply_hit( move: MoveData, attacker_facing: float = 1.0 ) -> void:
 	_update_percent_label();
 	
 	# Knockback magnitude: base + growth scaled by current percent.
-	# Simplified formula — good feel for early testing; can later match Melee weight/ratios more closely.
 	var kb: float = (
 		move.base_knockback + ( percent * move.knockback_growth * 0.01 )
 		) * KNOCKBACK_SCALE;

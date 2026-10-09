@@ -11,5 +11,5 @@ endlag_frames = 20
 damage = 13.0
 base_knockback = 40.0
 knockback_growth = 60.0
-angle_degrees = 180.0
+angle_degrees = 270.0
 hitlag_frames = 7

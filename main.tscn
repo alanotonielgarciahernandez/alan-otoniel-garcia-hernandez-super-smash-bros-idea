@@ -3,6 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://bbtbo0644l11x" path="res://stages/omega/omega.tscn" id="1_0xm2m"]
 [ext_resource type="PackedScene" uid="uid://bhwcnlj7x8ff7" path="res://characters/character.tscn" id="2_h2yge"]
 [ext_resource type="PackedScene" uid="uid://dbl4aiixjh6sw" path="res://camera/camera.tscn" id="3_h2yge"]
+[ext_resource type="Script" path="res://match/match_controller.gd" id="4_match"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_g4v7s"]
 size = Vector2(60, 20)
@@ -26,3 +27,9 @@ device_id = 0
 
 [node name="Camera" parent="." unique_id=1712798942 instance=ExtResource("3_h2yge")]
 position = Vector2(300, 0)
+
+[node name="Match" type="Node" parent="." unique_id=1900000001 node_paths=PackedStringArray("safe_zone", "respawn_point", "players")]
+script = ExtResource("4_match")
+safe_zone = NodePath("../Omega/SafeZone")
+respawn_point = NodePath("../Omega/RespawnPoint")
+players = [NodePath("../Brawler"), NodePath("../Brawler2")]

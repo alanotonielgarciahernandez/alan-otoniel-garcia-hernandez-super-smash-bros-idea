@@ -134,6 +134,10 @@ var hitstun_frames: int = 0;
 ## Frames of hitlag remaining. While > 0 the character is frozen.
 var hitlag_frames: int = 0;
 
+## Frames of respawn invulnerability remaining.
+## While > 0 this character cannot be KO'd by leaving the safe zone.
+var invuln_frames: int = 0;
+
 ## Horizontal facing. +1 = right, -1 = left.
 ## Source of truth for hitboxes, launch direction, and sprite flip.
 var facing: float = 1.0;
@@ -155,6 +159,10 @@ func _ready() -> void:
 	_update_percent_label();
 
 func _physics_process( _delta: float ) -> void:
+	# Count down respawn invulnerability every physics frame (including during hitlag).
+	if invuln_frames > 0:
+		invuln_frames -= 1;
+	
 	# Hitlag freeze — skip everything while frozen.
 	if hitlag_frames > 0:
 		hitlag_frames -= 1;
@@ -350,6 +358,42 @@ func apply_hit( move: MoveData, attacker_facing: float = 1.0 ) -> void:
 	
 	# TODO next:
 	# - Spawn hit spark / SFX
+
+## True while respawn invulnerability is active.
+func is_invulnerable() -> bool:
+	# Any positive frame count means the character cannot be KO'd.
+	return invuln_frames > 0;
+
+
+## Clears combat state and returns the character to Idle after a KO / respawn.
+## MatchController teleports the body and sets invuln_frames after calling this.
+func reset_for_respawn() -> void:
+	# Wipe damage so the next life starts clean.
+	percent = 0.0;
+	
+	# Stop all motion.
+	velocity = Vector2.ZERO;
+	
+	# Clear hit reactions.
+	hitstun_frames = 0;
+	hitlag_frames = 0;
+	
+	# Clear movement helpers that would otherwise carry over.
+	is_fast_falling = false;
+	falling_frames = 0;
+	land_frames = 0;
+	jumps_used = 0;
+	
+	# Drop any buffered inputs so nothing fires on the first frame of the new life.
+	_buffered_inputs.clear();
+	
+	# Refresh the percent UI.
+	_update_percent_label();
+	
+	# Force Idle so the state machine is not stuck in Hitstun / Fall / Attack.
+	if state_machine:
+		state_machine.transition_to( 'CharacterStateIdle', true );
+
 
 ## Refreshes the on-character percent text.
 func _update_percent_label() -> void:

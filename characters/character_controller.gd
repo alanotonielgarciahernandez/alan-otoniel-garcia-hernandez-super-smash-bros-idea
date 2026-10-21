@@ -63,7 +63,7 @@ const RUN_BURST_SPEED: float = 80.0;
 const GROUND_FRICTION: float = 1800.0;
 
 ## Air friction / traction (units per second²).
-## Higher = stops faster
+## Higher = stops faster.
 const AIR_FRICTION: float = 200.0;
 
 ## Multiplier so knockback magnitudes match jump / run scale.

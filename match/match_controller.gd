@@ -165,6 +165,23 @@ func _check_match_over() -> void:
 		print( 'Match over — winner: ', last_alive.name );
 	else:
 		print( 'Match over — no survivors' );
+	
+	# Freeze everyone still in the tree so play does not continue after the result.
+	_stop_match_play();
+
+
+## Stops input and physics on all registered fighters after a result.
+func _stop_match_play() -> void:
+	for player in players:
+		if player == null:
+			continue;
+		# Winner stays visible; eliminated fighters were already hidden.
+		player.set_physics_process( false );
+		player.set_process( false );
+		player.set_process_unhandled_input( false );
+		if player.state_machine:
+			player.state_machine.set_physics_process( false );
+			player.state_machine.set_process( false );
 
 
 ## Debug / HUD helper — remaining stocks for a fighter.

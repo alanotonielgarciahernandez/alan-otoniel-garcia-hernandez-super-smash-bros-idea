@@ -321,6 +321,10 @@ func apply_hit( move: MoveData, attacker_facing: float = 1.0 ) -> void:
 	if move == null:
 		return;
 	
+	# Respawn invulnerability blocks damage the same way it blocks blastzone KOs.
+	if is_invulnerable():
+		return;
+	
 	# Add damage percent.
 	percent += move.damage;
 	

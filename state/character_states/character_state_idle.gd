@@ -25,18 +25,18 @@ func process( _delta: float ) -> void:
 		state_machine.transition_to( 'CharacterStateJumpSquat' );
 		return;
 	
-	if _character.is_attack_just_pressed():
+	if _character.consume_attack_input():
 		var h := _character.get_move_axis();
 		var v := _character.get_vertical_axis();
 		
 		# Up has priority when stick is clearly up.
-		if v < -0.5:
+		if v < -CharacterController.STICK_TILT_THRESHOLD:
 			state_machine.transition_to( 'CharacterStateUpTilt' );
 		# Down has priority when stick is clearly down.
-		elif v > 0.5:
+		elif v > CharacterController.STICK_TILT_THRESHOLD:
 			state_machine.transition_to( 'CharacterStateDownTilt' );
 		# Forward when horizontal is dominant.
-		elif absf( h ) > 0.5:
+		elif absf( h ) > CharacterController.STICK_TILT_THRESHOLD:
 			state_machine.transition_to( 'CharacterStateForwardTilt' );
 		else:
 			state_machine.transition_to( 'CharacterStateJab' );
@@ -55,7 +55,7 @@ func physics_process( delta: float ) -> void:
 	_character.velocity.x = move_toward(
 		_character.velocity.x,
 		0.0,
-		CharacterController.GROUND_FRICTION * delta
+		_character.character_data.GROUND_FRICTION * delta
 	);
 	
 	# Apply gravity.

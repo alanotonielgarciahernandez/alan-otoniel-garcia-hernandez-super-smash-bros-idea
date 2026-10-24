@@ -22,9 +22,9 @@ func start() -> void:
 	var is_hard_land: bool = _character.is_fast_falling;
 	
 	if is_hard_land:
-		_character.land_frames = CharacterController.LAND_FRAMES_HARD;
+		_character.land_frames = _character.character_data.LAND_FRAMES_HARD;
 	else:
-		_character.land_frames = CharacterController.LAND_FRAMES_SOFT;
+		_character.land_frames = _character.character_data.LAND_FRAMES_SOFT;
 	
 	# Now it is safe to clear the flag.
 	_character.is_fast_falling = false;
@@ -53,7 +53,7 @@ func physics_process( delta: float ) -> void:
 	_character.velocity.x = move_toward(
 		_character.velocity.x,
 		0.0,
-		CharacterController.GROUND_FRICTION * delta
+		_character.character_data.GROUND_FRICTION * delta
 	);
 	
 	# Apply gravity (safety while grounded).

@@ -12,21 +12,21 @@ func physics_process( delta: float ) -> void:
 	var direction := _character.get_move_axis();
 	
 	# Decide target velocity for this frame.
-	var target_velocity_x: float = direction * CharacterController.AIR_SPEED;
+	var target_velocity_x: float = direction * _character.character_data.AIR_SPEED;
 	
 	if absf( direction ) > 0.01:
 		# Player is holding a direction — accelerate with air-specific rate.
 		_character.velocity.x = move_toward(
 			_character.velocity.x,
 			target_velocity_x,
-			CharacterController.AIR_ACCELERATION * delta
+			_character.character_data.AIR_ACCELERATION * delta
 		);
 	else:
 		# No meaningful input — apply air friction / traction.
 		_character.velocity.x = move_toward(
 			_character.velocity.x,
 			0.0,
-			CharacterController.AIR_FRICTION * delta
+			_character.character_data.AIR_FRICTION * delta
 		);
 	
 	# Apply gravity for this frame.

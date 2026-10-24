@@ -26,18 +26,18 @@ func start() -> void:
 			_character.jumps_used = 1;
 		
 		_character.jumps_used += 1;
-		_character.velocity.y = CharacterController.JUMP_VELOCITY;
+		_character.velocity.y = _character.character_data.JUMP_SPEED;
 
 func physics_process( delta: float ) -> void:
 	# Aerial attack.
-	if _character.is_attack_just_pressed():
+	if _character.consume_attack_input():
 		state_machine.transition_to( _character.get_aerial_attack_state() );
 		return;
 	
 	super.physics_process( delta );
 	
 	# Inside Jump.physics_process, after the hold/cut logic or near the top
-	if _character.is_jump_just_pressed() and _character.jumps_used < CharacterController.MAX_JUMPS:
+	if _character.is_jump_just_pressed() and _character.jumps_used < _character.character_data.MAX_JUMPS:
 		state_machine.transition_to( 'CharacterStateJump', true );
 		return;
 	

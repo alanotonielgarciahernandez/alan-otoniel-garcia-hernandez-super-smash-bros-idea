@@ -20,7 +20,7 @@ func start() -> void:
 	_character.animator.play( 'jump_squat' );
 	
 	# Start the jumpsquat frame count.
-	jump_squat_frames = CharacterController.JUMP_SQUAT_FRAMES;
+	jump_squat_frames = _character.character_data.JUMP_SQUAT_FRAMES;
 	
 	# Ignore attack buffered before this squat started.
 	_character.clear_buffered_input( 'attack' );
@@ -39,7 +39,7 @@ func physics_process( delta: float ) -> void:
 	_character.velocity.x = move_toward(
 		_character.velocity.x,
 		0.0,
-		CharacterController.GROUND_FRICTION * delta
+		_character.character_data.GROUND_FRICTION * delta
 	);
 	_character.apply_gravity( delta );
 	_character.move_and_slide();
@@ -60,9 +60,9 @@ func _finish_jumpsquat() -> void:
 	# If the button is still held at the end of squat → full hop.
 	# If the player already released → short hop.
 	if _character.is_jump_pressed():
-		_character.velocity.y = CharacterController.JUMP_VELOCITY;
+		_character.velocity.y = _character.character_data.JUMP_SPEED;
 	else:
-		_character.velocity.y = CharacterController.SHORT_HOP_VELOCITY;
+		_character.velocity.y = _character.character_data.SHORT_HOP_SPEED;
 	
 	# Buffered attack during squat → aerial immediately.
 	if _character.consume_buffered_input( 'attack' ):

@@ -14,7 +14,7 @@ func start() -> void:
 	_character.animator.play( 'walk' );
 	
 	# Set this tier's target horizontal speed (used by the base class's physics_process).
-	_speed = CharacterController.WALK_SPEED;
+	_speed = _character.character_data.WALK_SPEED;
 
 func process( delta: float ) -> void:
 	var direction := _character.get_move_axis();
@@ -25,7 +25,7 @@ func process( delta: float ) -> void:
 		state_machine.transition_to( _character.get_ground_move_state( direction ) );
 		return;
 	
-	if _character.is_attack_just_pressed():
+	if _character.consume_attack_input():
 		state_machine.transition_to( 'CharacterStateForwardTilt' );
 		return;
 	

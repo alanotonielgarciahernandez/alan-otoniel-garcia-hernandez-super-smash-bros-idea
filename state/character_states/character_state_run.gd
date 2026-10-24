@@ -13,19 +13,19 @@ func start() -> void:
 	_character.animator.play( 'run' );
 	
 	# Set this tier's target horizontal speed.
-	_speed = CharacterController.RUN_SPEED;
+	_speed = _character.character_data.RUN_SPEED;
 	
 	# One-time dash burst in the current facing / input direction.
 	var direction := _character.get_move_axis();
 	if direction != 0.0:
 		# Add burst on top of current velocity, clamped so it doesn't become extreme.
-		_character.velocity.x += signf( direction ) * CharacterController.RUN_BURST_SPEED;
+		_character.velocity.x += signf( direction ) * _character.character_data.RUN_BURST_SPEED;
 
 func process( delta: float ) -> void:
 	var direction := _character.get_move_axis();
 	var magnitude := absf( direction );
 	
-	if _character.is_attack_just_pressed():
+	if _character.consume_attack_input():
 		state_machine.transition_to( 'CharacterStateDashAttack' );
 		return;
 	

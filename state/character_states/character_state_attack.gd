@@ -59,7 +59,7 @@ func physics_process( delta: float ) -> void:
 	_character.velocity.x = move_toward(
 		_character.velocity.x,
 		0.0,
-		CharacterController.GROUND_FRICTION * delta
+		_character.character_data.GROUND_FRICTION * delta
 	);
 	
 	# Apply gravity so the character stays planted / can fall off edges.

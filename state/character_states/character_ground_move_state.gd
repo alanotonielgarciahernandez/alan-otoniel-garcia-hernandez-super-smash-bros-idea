@@ -53,14 +53,14 @@ func physics_process( delta: float ) -> void:
 		_character.velocity.x = move_toward(
 			_character.velocity.x,
 			target_velocity_x,
-			CharacterController.ACCELERATION_SPEED * delta
+			_character.character_data.ACCELERATION_SPEED * delta
 		);
 	else:
 		# No meaningful input — apply ground friction / traction.
 		_character.velocity.x = move_toward(
 			_character.velocity.x,
 			0.0,
-			CharacterController.GROUND_FRICTION * delta
+			_character.character_data.GROUND_FRICTION * delta
 		);
 	
 	# Apply gravity for this frame.

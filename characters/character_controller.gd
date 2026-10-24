@@ -2,8 +2,8 @@
 # Main character controller.
 #
 # It binds one input device to this character.
-# It buffers jump input and stores shared movement frame-data.
-# It exposes speeds, gravity, and the grounded movement-tier picker.
+# It buffers jump input and reads movement stats from CharacterData.
+# It applies gravity and picks the grounded movement tier.
 
 class_name CharacterController;
 extends CharacterBody2D;
@@ -19,76 +19,33 @@ const WALK_MAGNITUDE_THRESHOLD: float = 0.5;
 ## Magnitude considered "full tilt" — required (plus a dash trigger) to enter Run.
 const RUN_MAGNITUDE_THRESHOLD: float = 0.9;
 
+## Stick tilt that counts as a direction for fast-fall, aerials, and tilts.
+const STICK_TILT_THRESHOLD: float = 0.5;
+
 #endregion
 
-#region Character speed constants.
-
-## Acceleration applied to all grounded movement tiers (units/sec²).
-const ACCELERATION_SPEED: float = JOG_SPEED * 6.0;
-
-## Horizontal acceleration while airborne (units per second²).
-## Lower than grounded acceleration so air drift feels less snappy than running.
-const AIR_ACCELERATION: float = ACCELERATION_SPEED * 0.5;
-
-## Walking speed (analog partial tilt only).
-const WALK_SPEED: float = 100.0;
-
-## Jogging speed (default tier — keyboard's only tier without dashing).
-const JOG_SPEED: float = 200.0;
-
-## Running speed (reached via a dash trigger).
-const RUN_SPEED: float = 320.0;
-
-## Speed applied when character is in air.
-const AIR_SPEED: float = 200.0;
-
-## Short hop vertical velocity.
-const SHORT_HOP_VELOCITY: float = -280.0;
-
-## Jump Velocity.
-const JUMP_VELOCITY: float = -500.0;
-
-## Maximum speed at which the player can normally fall.
-const TERMINAL_VELOCITY: float = 220.0;
-
-## Fast-fall maximum fall speed.
-const FAST_FALL_SPEED: float = 360.0;
-
-## Extra horizontal speed applied once when entering Run from a dash.
-## Makes the initial dash feel snappy.
-const RUN_BURST_SPEED: float = 80.0;
-
-## Ground friction / traction (units per second²).
-## Higher = stops faster.
-const GROUND_FRICTION: float = 1800.0;
-
-## Air friction / traction (units per second²).
-## Higher = stops faster.
-const AIR_FRICTION: float = 200.0;
+## Frames allowed to still ground-jump after leaving the floor.
+const COYOTE_FRAMES: int = 7;
 
 ## Multiplier so knockback magnitudes match jump / run scale.
 const KNOCKBACK_SCALE: float = 4.5;
 
-#endregion
+## Hitstun frames added per point of Smash knockback, before pixel scaling.
+const HITSTUN_PER_KNOCKBACK: float = 0.54;
 
-#region Character actions frame-data constants.
+## Hitstun frames every hit starts with, before knockback adds more.
+const HITSTUN_BASE_FRAMES: int = 8;
 
-## Frames allowed for the character to perform a ground jump after leaving the floor.
-const COYOTE_FRAMES: int = 7;
+## Damage percent cap. Matches the usual Smash display limit.
+const MAX_PERCENT: float = 999.0;
 
-## Frame duration of the grounded jumpsquat.
-const JUMP_SQUAT_FRAMES: int = 3;
 
-## Soft landing recovery (normal fall / short hop).
-const LAND_FRAMES_SOFT: int = 4;
+## Device controlling this character. -1 = keyboard. 0+ = joypad index,
+## matching Input.get_connected_joypads().
+@export var device_id: int = -1;
 
-## Hard landing recovery (fast-fall or high fall speed).
-const LAND_FRAMES_HARD: int = 11;
-
-#endregion
-
-## Maximum number of jumps allowed before touching the ground again
-const MAX_JUMPS: int = 2;
+## Per-fighter speeds, traction, and action frame data.
+@export var character_data: CharacterData;
 
 ## Character State Machine object reference.
 @export var state_machine: StateMachine;
@@ -99,9 +56,9 @@ const MAX_JUMPS: int = 2;
 ## Character Hitbox container object reference.
 @export var hitbox_container: Node2D;
 
-## Device controlling this character. -1 = keyboard. 0+ = joypad index,
-## matching Input.get_connected_joypads().
-@export var device_id: int = -1;
+## Percent label above the character.
+@export var percent_label: Label;
+
 
 ## Device-specific input reader, created once in _ready() based on device_id.
 ## Never re-evaluated afterward — this character always listens to only this device.
@@ -112,6 +69,10 @@ var _input_reader: InputReader;
 ## action_name -> remaining frames the buffer is still valid.
 ## 0 or missing = not buffered / expired.
 var _buffered_inputs: Dictionary = {};
+
+## Actions buffered since the last tick. Those skip one countdown so the
+## press frame still counts as part of INPUT_BUFFER_WINDOW.
+var _fresh_buffers: Dictionary = {};
 
 ## Number of jumps performed since the character was last on the floor.
 var jumps_used: int = 0;
@@ -144,17 +105,19 @@ var facing: float = 1.0;
 
 #endregion
 
-## Percent label above the character.
-@export var percent_label: Label;
-
 
 func _ready() -> void:
 	@warning_ignore( 'incompatible_ternary' )
 	# Assign the input reader matching this character's device, once.
 	_input_reader = KeyboardInputReader.new() if device_id == -1 else JoypadInputReader.new( device_id );
 	
+	# Scale the hitbox container to the facing direction.
 	if hitbox_container:
 		hitbox_container.scale.x = facing;
+	
+	# Movement reads this resource every frame, so a missing assignment should fail here.
+	if character_data == null:
+		push_error( 'CharacterController is missing a CharacterData resource.' );
 	
 	_update_percent_label();
 
@@ -163,7 +126,11 @@ func _physics_process( _delta: float ) -> void:
 	if invuln_frames > 0:
 		invuln_frames -= 1;
 	
-	# Hitlag freeze — skip everything while frozen.
+	# Keep recording input during hitlag. States stay frozen, but a tap still lands in the buffer.
+	_tick_input_buffers();
+	_input_reader.update();
+	
+	# Hitlag freeze — skip movement clocks while frozen.
 	if hitlag_frames > 0:
 		hitlag_frames -= 1;
 		return;
@@ -173,22 +140,24 @@ func _physics_process( _delta: float ) -> void:
 		falling_frames = 0;
 	else:
 		falling_frames += 1;
-	
-	# Count down every active input buffer by one frame.
-	_tick_input_buffers();
-	
-	# Refresh this character's input reader (just-pressed tracking, dash window).
-	_input_reader.update();
 
 func _unhandled_input( event: InputEvent ) -> void:
-	# Buffer jump input the instant it's pressed on this character's device.
+	# Buffer jump the instant it's pressed, including during hitlag.
 	if _input_reader.is_action_press_event( 'jump', event ):
 		buffer_input( 'jump' );
+		# This event arrives before the physics tick, so that tick must not consume the press frame.
+		_fresh_buffers[ 'jump' ] = true;
+	
+	# Buffer attack the same way, so a tap inside hitlag is still there when the character can act.
+	if _input_reader.is_action_press_event( 'attack', event ):
+		buffer_input( 'attack' );
+		_fresh_buffers[ 'attack' ] = true;
 
+#region Input related functions.
 
 ## Whether the down direction is pressed past a threshold on this device.
 func is_down_pressed() -> bool:
-	return _input_reader.get_vertical_axis() > 0.5;
+	return _input_reader.get_vertical_axis() > STICK_TILT_THRESHOLD;
 
 ## Whether jump was pressed this frame, from this character's assigned device only.
 func is_jump_just_pressed() -> bool:
@@ -205,6 +174,16 @@ func is_attack_just_pressed() -> bool:
 ## Whether attack is currently held, from this character's assigned device only.
 func is_attack_pressed() -> bool:
 	return _input_reader.is_action_pressed( 'attack' );
+
+## True once when attack was just pressed or is still sitting in the buffer.
+## Clears the buffer either way so the same press cannot start two attacks.
+func consume_attack_input() -> bool:
+	var pressed := is_attack_just_pressed();
+	
+	# Drop a stored press so a later state does not fire it again.
+	var buffered := consume_buffered_input( 'attack' );
+	
+	return pressed or buffered;
 
 ## Returns this character's horizontal input axis, from its assigned device only.
 func get_move_axis() -> float:
@@ -248,6 +227,7 @@ func consume_buffered_input( action: String ) -> bool:
 	
 	# Always consume (erase) on check to avoid stale reads later.
 	_buffered_inputs.erase( action );
+	_fresh_buffers.erase( action );
 	
 	# Valid only if at least one frame remained.
 	return remaining > 0;
@@ -255,6 +235,7 @@ func consume_buffered_input( action: String ) -> bool:
 ## Clears a specific buffered action without consuming it (e.g. on cancel conditions).
 func clear_buffered_input( action: String ) -> void:
 	_buffered_inputs.erase( action );
+	_fresh_buffers.erase( action );
 
 ## Counts every active input buffer down by one frame.
 ## Call this once per physics frame from _physics_process.
@@ -263,24 +244,47 @@ func _tick_input_buffers() -> void:
 	var expired: Array[ String ] = [];
 	
 	for action in _buffered_inputs:
+		# Leave a same-frame press at the full window so 9 means 9 readable frames.
+		if _fresh_buffers.has( action ):
+			continue;
+		
 		_buffered_inputs[ action ] -= 1;
 		
 		# Mark for removal once the window has fully expired.
 		if _buffered_inputs[ action ] <= 0:
 			expired.append( action );
 	
+	# Fresh flags only protect the frame they were set.
+	_fresh_buffers.clear();
+	
 	# Erase expired buffers after the loop.
 	for action in expired:
 		_buffered_inputs.erase( action );
+
+#endregion
+
+#region Movement related functions.
 
 ## Resets the jump counter. Called explicitly by states once a landing is confirmed.
 func recharge_jumps() -> void:
 	jumps_used = 0;
 
-## Applies gravity to vertical velocity, clamped to the correct terminal speed.
+## Applies gravity to vertical velocity.
+## Controllable falls clamp to terminal or fast-fall speed. Hitstun does not.
 func apply_gravity( delta: float ) -> void:
-	var max_fall: float = FAST_FALL_SPEED if is_fast_falling else TERMINAL_VELOCITY;
-	velocity.y = minf( max_fall, velocity.y + get_gravity().y * delta );
+	# No stats assigned — skip rather than crash on the next physics frame.
+	if character_data == null:
+		return;
+	
+	var gravity_step := get_gravity().y * delta;
+	
+	# Hitstun keeps the launch. The fall cap is only for a controllable fall.
+	if hitstun_frames > 0:
+		velocity.y += gravity_step;
+		return;
+	
+	var max_fall: float = character_data.FAST_FALL_SPEED if is_fast_falling else character_data.TERMINAL_SPEED;
+	velocity.y = minf( max_fall, velocity.y + gravity_step );
 
 ## Sets facing from a horizontal input or explicit sign.
 ## Also syncs the animator so the sprite matches.
@@ -299,15 +303,17 @@ func set_facing( direction: float ) -> void:
 	if hitbox_container:
 		hitbox_container.scale.x = facing;
 
+#endregion
+
 func get_aerial_attack_state() -> String:
 	var h_direction := get_move_axis();
 	var v_direction := get_vertical_axis();
 	
-	if v_direction < -0.5:
+	if v_direction < -STICK_TILT_THRESHOLD:
 		return 'CharacterStateUpAerial';
-	elif v_direction > 0.5:
+	elif v_direction > STICK_TILT_THRESHOLD:
 		return 'CharacterStateDownAerial';
-	elif absf( h_direction ) > 0.5:
+	elif absf( h_direction ) > STICK_TILT_THRESHOLD:
 		if signf( h_direction ) == facing:
 			return 'CharacterStateForwardAerial';
 		return 'CharacterStateBackwardAerial';
@@ -325,15 +331,14 @@ func apply_hit( move: MoveData, attacker_facing: float = 1.0 ) -> void:
 	if is_invulnerable():
 		return;
 	
-	# Add damage percent.
-	percent += move.damage;
+	# Add damage percent, capped at the Smash display limit.
+	percent = minf( percent + move.damage, MAX_PERCENT );
 	
 	_update_percent_label();
 	
-	# Knockback magnitude: base + growth scaled by current percent.
-	var kb: float = (
-		move.base_knockback + ( percent * move.knockback_growth * 0.01 )
-		) * KNOCKBACK_SCALE;
+	# Smash knockback amount, then the pixel-speed conversion.
+	var smash_kb: float = move.base_knockback + ( percent * move.knockback_growth * 0.01 );
+	var kb: float = smash_kb * KNOCKBACK_SCALE;
 	
 	# Launch direction from angle (0° = forward, 90° = straight up).
 	var rad: float = deg_to_rad( move.angle_degrees );
@@ -346,9 +351,8 @@ func apply_hit( move: MoveData, attacker_facing: float = 1.0 ) -> void:
 	# Cancel fast-fall on hit.
 	is_fast_falling = false;
 	
-	# Simple hitstun length (tune later). Light jab starts around 8–12 frames.
-	# Rough rule: base + a little bit of the knockback magnitude.
-	hitstun_frames = 8 + int( kb * 0.12 );
+	# Stun follows the Smash knockback amount, so the pixel scale does not change it.
+	hitstun_frames = HITSTUN_BASE_FRAMES + int( smash_kb * HITSTUN_PER_KNOCKBACK );
 	
 	# Freeze this character (the victim) for the move's hitlag window.
 	hitlag_frames = move.hitlag_frames;
@@ -356,9 +360,6 @@ func apply_hit( move: MoveData, attacker_facing: float = 1.0 ) -> void:
 	# Force the character into Hitstun so they cannot act immediately.
 	if state_machine:
 		state_machine.transition_to( 'CharacterStateHitstun' );
-	
-	# Temporary debug feedback.
-	print( 'Hit! percent = ', percent, '  kb = ', kb, '  angle = ', move.angle_degrees );
 	
 	# TODO next:
 	# - Spawn hit spark / SFX
@@ -390,6 +391,7 @@ func reset_for_respawn() -> void:
 	
 	# Drop any buffered inputs so nothing fires on the first frame of the new life.
 	_buffered_inputs.clear();
+	_fresh_buffers.clear();
 	
 	# Refresh the percent UI.
 	_update_percent_label();
@@ -404,4 +406,5 @@ func _update_percent_label() -> void:
 	if percent_label == null:
 		return;
 	
-	percent_label.text = str( percent, '%' );
+	# Whole number, matching the Smash percent display.
+	percent_label.text = str( int( percent ) ) + '%';

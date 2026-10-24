@@ -16,7 +16,7 @@ func start() -> void:
 
 func physics_process( delta: float ) -> void:
 	# Aerial attack.
-	if _character.is_attack_just_pressed():
+	if _character.consume_attack_input():
 		state_machine.transition_to( _character.get_aerial_attack_state() );
 		return;
 	
@@ -27,10 +27,10 @@ func physics_process( delta: float ) -> void:
 	if not _character.is_fast_falling and _character.velocity.y > 0.0:
 		if _character.is_down_pressed():
 			_character.is_fast_falling = true;
-			_character.velocity.y = CharacterController.FAST_FALL_SPEED;
+			_character.velocity.y = _character.character_data.FAST_FALL_SPEED;
 	
 	# Double/extra jump (Jump state will consume a charge).
-	if _character.is_jump_just_pressed() and _character.jumps_used < CharacterController.MAX_JUMPS:
+	if _character.is_jump_just_pressed() and _character.jumps_used < _character.character_data.MAX_JUMPS:
 		state_machine.transition_to( 'CharacterStateJump' );
 		return;
 	

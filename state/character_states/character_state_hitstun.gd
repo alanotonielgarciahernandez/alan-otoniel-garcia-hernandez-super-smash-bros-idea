@@ -19,7 +19,7 @@ func start() -> void:
 	#_character.animator.play( 'hitstun' );
 
 func physics_process( delta: float ) -> void:
-	var friction: float = CharacterController.GROUND_FRICTION if _character.is_on_floor() else CharacterController.AIR_FRICTION * 0.5;
+	var friction: float = _character.character_data.GROUND_FRICTION if _character.is_on_floor() else _character.character_data.AIR_FRICTION * 0.5;
 	
 	# Apply residual friction.
 	_character.velocity.x = move_toward(

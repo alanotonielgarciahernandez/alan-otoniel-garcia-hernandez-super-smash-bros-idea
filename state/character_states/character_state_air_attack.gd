@@ -58,19 +58,19 @@ func process( _delta: float ) -> void:
 func physics_process( delta: float ) -> void:
 	# Horizontal air drift (same model as CharacterAirState).
 	var direction := _character.get_move_axis();
-	var target_velocity_x: float = direction * CharacterController.AIR_SPEED;
+	var target_velocity_x: float = direction * _character.character_data.AIR_SPEED;
 	
 	if absf( direction ) > 0.01:
 		_character.velocity.x = move_toward(
 			_character.velocity.x,
 			target_velocity_x,
-			CharacterController.AIR_ACCELERATION * delta
+			_character.character_data.AIR_ACCELERATION * delta
 		);
 	else:
 		_character.velocity.x = move_toward(
 			_character.velocity.x,
 			0.0,
-			CharacterController.AIR_FRICTION * delta
+			_character.character_data.AIR_FRICTION * delta
 		);
 	
 	# Gravity while attacking in the air.

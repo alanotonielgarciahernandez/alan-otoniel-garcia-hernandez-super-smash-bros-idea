@@ -131,8 +131,8 @@ func _physics_process( _delta: float ) -> void:
 	_input_reader.update();
 	
 	# Hitlag freeze — skip movement clocks while frozen.
+	# The state machine counts the frames down after it has skipped that frame.
 	if hitlag_frames > 0:
-		hitlag_frames -= 1;
 		return;
 	
 	# Falling frames reset if character is on floor.

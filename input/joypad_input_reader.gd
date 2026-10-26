@@ -8,6 +8,8 @@ class_name JoypadInputReader;
 extends InputReader;
 
 ## Deadzone applied to the raw analog stick axis.
+## Dash neutral is wider (InputReader.DASH_NEUTRAL_THRESHOLD, 0.3), so a
+## light tilt past this deadzone can still count as a flick's starting point.
 const DEADZONE: float = 0.2;
 
 ## Index of the joypad this reader is exclusively bound to.

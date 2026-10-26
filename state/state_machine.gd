@@ -63,12 +63,14 @@ func _process( delta: float ) -> void:
 	# Hold the sprite on the frame it had when the hit connected.
 	_sync_hitlag_animation();
 	
-	# Skip while the controlled character is in hitlag.
-	if _in_hitlag():
-		return;
-	
-	if current_state:
+	# Skip the state while frozen. The press edge still has to expire below.
+	if not _in_hitlag() and current_state:
 		current_state.process( delta );
+	
+	# One idle frame may read a press. Later idle frames must not see it again.
+	var character := _controlled_character();
+	if character:
+		character.expire_just_pressed();
 
 func _physics_process( delta: float ) -> void:
 	# Skip while the controlled character is in hitlag.

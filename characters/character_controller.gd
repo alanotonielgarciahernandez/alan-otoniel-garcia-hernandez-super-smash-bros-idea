@@ -111,6 +111,9 @@ func _ready() -> void:
 	# Assign the input reader matching this character's device, once.
 	_input_reader = KeyboardInputReader.new() if device_id == -1 else JoypadInputReader.new( device_id );
 	
+	# A key held as the match starts is not a just-pressed.
+	_input_reader.prime_held_actions();
+	
 	# Scale the hitbox container to the facing direction.
 	if hitbox_container:
 		hitbox_container.scale.x = facing;
@@ -142,6 +145,9 @@ func _physics_process( _delta: float ) -> void:
 		falling_frames += 1;
 
 func _unhandled_input( event: InputEvent ) -> void:
+	# Press order has to land before the axis is read, including during hitlag.
+	_input_reader.note_input_event( event );
+	
 	# Buffer jump the instant it's pressed, including during hitlag.
 	if _input_reader.is_action_press_event( 'jump', event ):
 		buffer_input( 'jump' );
@@ -193,6 +199,10 @@ func get_move_axis() -> float:
 func get_vertical_axis() -> float:
 	return _input_reader.get_vertical_axis();
 
+## Drops press edges the states did not read this idle frame.
+func expire_just_pressed() -> void:
+	_input_reader.expire_just_pressed();
+
 ## Returns the grounded movement state to enter for the given horizontal
 ## input — used when starting fresh movement (from Idle or on landing).
 func get_ground_move_state( direction: float ) -> String:
@@ -201,7 +211,8 @@ func get_ground_move_state( direction: float ) -> String:
 	if magnitude == 0.0:
 		return 'CharacterStateIdle';
 	
-	if _input_reader.consume_dash_trigger():
+	# Full tilt inside an open dash window. The reader only times the window.
+	if magnitude >= RUN_MAGNITUDE_THRESHOLD and _input_reader.consume_dash_trigger():
 		return 'CharacterStateRun';
 	
 	if magnitude < WALK_MAGNITUDE_THRESHOLD:

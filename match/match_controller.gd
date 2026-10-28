@@ -45,6 +45,8 @@ func _ready() -> void:
 		# instance_id is stable for the lifetime of the node.
 		_stocks[ player.get_instance_id() ] = DEFAULT_STOCKS;
 		_eliminated[ player.get_instance_id() ] = false;
+		# Push the starting count into the on-character label.
+		player.set_stock_display( DEFAULT_STOCKS );
 		# Debug so we can confirm wiring in the editor run.
 		print( 'MatchController: registered ', player.name, ' with ', DEFAULT_STOCKS, ' stocks' );
 	
@@ -91,6 +93,9 @@ func _handle_ko( character: CharacterController ) -> void:
 	# Spend one stock.
 	_stocks[ id ] = int( _stocks[ id ] ) - 1;
 	var remaining: int = int( _stocks[ id ] );
+	
+	# Update the on-character stock label immediately.
+	character.set_stock_display( remaining );
 	
 	print( 'KO: ', character.name, ' — stocks left: ', remaining );
 	

@@ -59,6 +59,9 @@ const MAX_PERCENT: float = 999.0;
 ## Percent label above the character.
 @export var percent_label: Label;
 
+## Stock count label above the character (next to percent).
+@export var stock_label: Label;
+
 
 ## Device-specific input reader, created once in _ready() based on device_id.
 ## Never re-evaluated afterward — this character always listens to only this device.
@@ -410,6 +413,16 @@ func reset_for_respawn() -> void:
 	# Force Idle so the state machine is not stuck in Hitstun / Fall / Attack.
 	if state_machine:
 		state_machine.transition_to( 'CharacterStateIdle', true );
+
+
+## Pushes the current stock count into the on-character label.
+## Called by MatchController after registration and after each KO.
+func set_stock_display( count: int ) -> void:
+	if stock_label == null:
+		return;
+	
+	# Simple integer display. 0 means eliminated.
+	stock_label.text = str( count );
 
 
 ## Refreshes the on-character percent text.

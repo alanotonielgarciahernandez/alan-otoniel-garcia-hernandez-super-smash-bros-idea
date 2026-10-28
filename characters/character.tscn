@@ -331,13 +331,14 @@ radius = 20.0
 [sub_resource type="CircleShape2D" id="CircleShape2D_uq2ax"]
 radius = 20.0
 
-[node name="Character" type="CharacterBody2D" unique_id=607234549 node_paths=PackedStringArray("state_machine", "animator", "hitbox_container", "percent_label")]
+[node name="Character" type="CharacterBody2D" unique_id=607234549 node_paths=PackedStringArray("state_machine", "animator", "hitbox_container", "percent_label", "stock_label")]
 script = ExtResource("1_ke030")
 state_machine = NodePath("StateMachine")
 animator = NodePath("AnimatedSprite2D")
 hitbox_container = NodePath("Hitboxes")
 character_data = ExtResource("2_u7xjn")
 percent_label = NodePath("Debug/Percent")
+stock_label = NodePath("Debug/Stock")
 metadata/launch_direction = Vector2(0, 0)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=138225110]
@@ -553,5 +554,15 @@ offset_right = 16.0
 offset_bottom = -20.0
 theme_override_font_sizes/font_size = 11
 text = "0.00%"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Stock" type="Label" parent="Debug" unique_id=1620316686]
+offset_left = -40.0
+offset_top = -36.0
+offset_right = -20.0
+offset_bottom = -20.0
+theme_override_font_sizes/font_size = 11
+text = "3"
 horizontal_alignment = 1
 vertical_alignment = 1
